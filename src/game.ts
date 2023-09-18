@@ -1,3 +1,5 @@
+import sprites from './sprites.png';
+
 const BOARD_WIDTH = 28 * 8;
 const BOARD_HEIGHT = 36 * 8;
 
@@ -86,7 +88,7 @@ export class Game {
     player: Player = new Player();
     controls: Controls = new Controls();
     bullets: Bullet[] = [];
-    enemies: Enemy[] = [new Enemy(5), new Enemy(6.5), new Enemy(8), new Enemy(9.5)]
+    enemies: Enemy[] = [new Enemy(5), new Enemy(6), new Enemy(7), new Enemy(8), new Enemy(9), new Enemy(10), new Enemy(11), new Enemy(12)]
     stars: Star[] = [];
 
     constructor() {
@@ -104,11 +106,11 @@ export class Game {
         }
         if (this.controls.right) {
             this.player.x += 2;
-            if (this.player.x > BOARD_WIDTH - 8) this.player.x = BOARD_WIDTH - 8;
+            if (this.player.x > BOARD_WIDTH - 16) this.player.x = BOARD_WIDTH - 16;
         }
         if (this.controls.fire) {
             this.controls.fire = false;
-            this.bullets.push(new Bullet(this.player.x + 3, this.player.y));
+            this.bullets.push(new Bullet(this.player.x + 7, this.player.y));
         }
 
         this.bullets.forEach((bullet) => bullet.tick());
@@ -133,7 +135,7 @@ class Sprite {
 
 class Player extends Sprite {
     constructor() {
-        super(14 * 8 - 4, 34 * 8);
+        super(13 * 8, 34 * 8);
     }
 }
 
@@ -181,6 +183,9 @@ class Controls {
 
 function init() {
     const game = new Game();
+
+    const spritesImage = new Image();
+    spritesImage.src = sprites;
 
     document.addEventListener('keydown', (ev) => {
         switch (ev.key) {
@@ -314,17 +319,18 @@ function init() {
             ctx.fillRect(star.x, Math.floor((star.y + game.tickCount * (.2 - .05 * star.depth)) % BOARD_HEIGHT), 1, 1);
         }
 
-        ctx.fillStyle = 'white';
-        ctx.fillRect(Math.round(game.player.x), Math.round(game.player.y), 8, 8)
+        ctx.drawImage(spritesImage, 0, 37 * 8, 16, 8, Math.round(game.player.x), Math.round(game.player.y), 16, 8);
 
         ctx.fillStyle = 'red';
         for (const bullet of game.bullets) {
             ctx.fillRect(Math.round(bullet.x), Math.round(bullet.y), 2, 6);
         }
 
-        ctx.fillStyle = 'gray';
+        // ctx.fillStyle = 'gray';
+        let i = 0;
         for (const enemy of game.enemies) {
-            ctx.fillRect(Math.round(enemy.x), Math.round(enemy.y), 8, 8);
+            ctx.drawImage(spritesImage, i < 4 ? 0 : 8, i * 8, 8, 8, Math.round(enemy.x), Math.round(enemy.y), 8, 8);
+            i++;
         }
     }
 }
