@@ -184,7 +184,7 @@ class Enemy extends Sprite {
         this.spriteX = spriteX;
     }
 
-    updatePosition(offset:number) {
+    updatePosition(offset: number) {
         this.x = offset + 8 * this.column;
     }
 
@@ -253,7 +253,7 @@ function init() {
 
     document.addEventListener('keydown', (ev) => {
         switch (ev.key) {
-            case 'ArrowLeft': 
+            case 'ArrowLeft':
                 game.controls.left = true;
                 break;
             case 'ArrowRight':
@@ -267,7 +267,7 @@ function init() {
 
     document.addEventListener('keyup', (ev) => {
         switch (ev.key) {
-            case 'ArrowLeft': 
+            case 'ArrowLeft':
                 game.controls.left = false;
                 break;
             case 'ArrowRight':
@@ -284,81 +284,81 @@ function init() {
     // TODO !gl
 
 
-  // setup GLSL program
-  const program = createProgramFromSources(gl, [vs, fs]);
+    // setup GLSL program
+    const program = createProgramFromSources(gl, [vs, fs])!;
 
-  // look up where the vertex data needs to go.
-  const positionAttributeLocation = gl.getAttribLocation(program, "a_position");
+    // look up where the vertex data needs to go.
+    const positionAttributeLocation = gl.getAttribLocation(program, "a_position");
 
-  var texcoordLocation = gl.getAttribLocation(program, "a_texcoord");
+    var texcoordLocation = gl.getAttribLocation(program, "a_texcoord");
 
-  // look up uniform locations
-  const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
+    // look up uniform locations
+    const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
 
-  // Create a buffer to put three 2d clip space points in
-  const positionBuffer = gl.createBuffer();
+    // Create a buffer to put three 2d clip space points in
+    const positionBuffer = gl.createBuffer();
 
-  // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
-  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
-  gl.enableVertexAttribArray(texcoordLocation);
-  // We'll supply texcoords as floats.
-  gl.vertexAttribPointer(texcoordLocation, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(texcoordLocation);
+    // We'll supply texcoords as floats.
+    gl.vertexAttribPointer(texcoordLocation, 2, gl.FLOAT, false, 0, 0);
 
-  // fill it with a 2 triangles that cover clipspace
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-    -1, -1,  // first triangle
-    1, -1,
-   -1,  1,
-   -1,  1,  // second triangle
-    1, -1,
-    1,  1,
-  ]), gl.STATIC_DRAW);
+    // fill it with a 2 triangles that cover clipspace
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+        -1, -1,  // first triangle
+        1, -1,
+        -1, 1,
+        -1, 1,  // second triangle
+        1, -1,
+        1, 1,
+    ]), gl.STATIC_DRAW);
 
-  const canvasTex = gl.createTexture();
-  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-  gl.bindTexture(gl.TEXTURE_2D, canvasTex);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureCanvas);
-  // make sure we can render it even if it's not a power of 2
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
-  function glDraw() {
+    const canvasTex = gl.createTexture();
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     gl.bindTexture(gl.TEXTURE_2D, canvasTex);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureCanvas);
-    resizeCanvasToDisplaySize(gl.canvas);
+    // make sure we can render it even if it's not a power of 2
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
-  // Tell WebGL how to convert from clip space to pixels
-  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    function glDraw() {
+        gl.bindTexture(gl.TEXTURE_2D, canvasTex);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureCanvas);
+        resizeCanvasToDisplaySize(<HTMLCanvasElement>gl.canvas);
 
-  // Tell it to use our program (pair of shaders)
-  gl.useProgram(program);
+        // Tell WebGL how to convert from clip space to pixels
+        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-  // Turn on the attribute
-  gl.enableVertexAttribArray(positionAttributeLocation);
+        // Tell it to use our program (pair of shaders)
+        gl.useProgram(program);
 
-  // Bind the position buffer.
-  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        // Turn on the attribute
+        gl.enableVertexAttribArray(positionAttributeLocation);
 
-  // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-  gl.vertexAttribPointer(
-      positionAttributeLocation,
-      2,          // 2 components per iteration
-      gl.FLOAT,   // the data is 32bit floats
-      false,      // don't normalize the data
-      0,          // 0 = move forward size * sizeof(type) each iteration to get the next position
-      0,          // start at the beginning of the buffer
-  );
+        // Bind the position buffer.
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
-  gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height);
+        // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
+        gl.vertexAttribPointer(
+            positionAttributeLocation,
+            2,          // 2 components per iteration
+            gl.FLOAT,   // the data is 32bit floats
+            false,      // don't normalize the data
+            0,          // 0 = move forward size * sizeof(type) each iteration to get the next position
+            0,          // start at the beginning of the buffer
+        );
 
-  gl.drawArrays(
-      gl.TRIANGLES,
-      0,     // offset
-      6,     // num vertices to process
-  );
-  }
+        gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height);
+
+        gl.drawArrays(
+            gl.TRIANGLES,
+            0,     // offset
+            6,     // num vertices to process
+        );
+    }
 
     setInterval(gameLoop, 1000 / 60);
 
@@ -369,7 +369,7 @@ function init() {
     }
 
     function draw() {
-        
+
         ctx.fillStyle = 'black';
         ctx.fillRect(0, 0, BOARD_WIDTH, BOARD_HEIGHT);
 
@@ -407,12 +407,11 @@ function init() {
 const defaultShaderType = [
     'VERTEX_SHADER',
     'FRAGMENT_SHADER',
-  ];
+];
 
-function loadShader(gl, shaderSource, shaderType, opt_errorCallback) {
-    const errFn = opt_errorCallback || Error;
+function loadShader(gl: WebGLRenderingContext, shaderSource: string, shaderType: number): WebGLShader | null {
     // Create the shader object
-    const shader = gl.createShader(shaderType);
+    const shader = gl.createShader(shaderType)!;
 
     // Load the shader source
     gl.shaderSource(shader, shaderSource);
@@ -423,67 +422,56 @@ function loadShader(gl, shaderSource, shaderType, opt_errorCallback) {
     // Check the compile status
     const compiled = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
     if (!compiled) {
-      // Something went wrong during compilation; get the error
-      const lastError = gl.getShaderInfoLog(shader);
-      errFn('*** Error compiling shader \'' + shader + '\':' + lastError + `\n` + shaderSource.split('\n').map((l,i) => `${i + 1}: ${l}`).join('\n'));
-      gl.deleteShader(shader);
-      return null;
+        // Something went wrong during compilation; get the error
+        const lastError = gl.getShaderInfoLog(shader);
+        console.error('*** Error compiling shader \'' + shader + '\':' + lastError + `\n` + shaderSource.split('\n').map((l, i) => `${i + 1}: ${l}`).join('\n'));
+        gl.deleteShader(shader);
+        return null;
     }
 
     return shader;
-  }
+}
 
-  function createProgram(
-    gl, shaders, opt_attribs, opt_locations, opt_errorCallback) {
-  const errFn = opt_errorCallback || Error;
-  const program = gl.createProgram();
-  shaders.forEach(function(shader) {
-    gl.attachShader(program, shader);
-  });
-  if (opt_attribs) {
-    opt_attribs.forEach(function(attrib, ndx) {
-      gl.bindAttribLocation(
-          program,
-          opt_locations ? opt_locations[ndx] : ndx,
-          attrib);
+function createProgram(gl: WebGLRenderingContext, shaders: (WebGLShader | null)[]) {
+    const program = gl.createProgram()!;
+    shaders.forEach(function (shader: WebGLShader | null) {
+        if (!shader) return;
+        gl.attachShader(program, shader);
     });
-  }
-  gl.linkProgram(program);
+    gl.linkProgram(program);
 
-  // Check the link status
-  const linked = gl.getProgramParameter(program, gl.LINK_STATUS);
-  if (!linked) {
-      // something went wrong with the link
-      const lastError = gl.getProgramInfoLog(program);
-      errFn('Error in program linking:' + lastError);
+    // Check the link status
+    const linked = gl.getProgramParameter(program, gl.LINK_STATUS);
+    if (!linked) {
+        // something went wrong with the link
+        const lastError = gl.getProgramInfoLog(program);
+        console.error('Error in program linking:' + lastError);
 
-      gl.deleteProgram(program);
-      return null;
-  }
-  return program;
+        gl.deleteProgram(program);
+        return null;
+    }
+    return program;
 }
 
-function createProgramFromSources(
-    gl, shaderSources, opt_attribs, opt_locations, opt_errorCallback) {
-  const shaders = [];
-  for (let ii = 0; ii < shaderSources.length; ++ii) {
-    shaders.push(loadShader(
-        gl, shaderSources[ii], gl[defaultShaderType[ii]], opt_errorCallback));
-  }
-  return createProgram(gl, shaders, opt_attribs, opt_locations, opt_errorCallback);
+function createProgramFromSources(gl: WebGLRenderingContext, shaderSources: string[]) {
+    const shaders = [];
+    for (let ii = 0; ii < shaderSources.length; ++ii) {
+        shaders.push(loadShader(
+            gl, shaderSources[ii], (<any>gl)[defaultShaderType[ii]]));
+    }
+    return createProgram(gl, shaders);
 }
 
-function resizeCanvasToDisplaySize(canvas, multiplier) {
-    multiplier = multiplier || 1;
-    const width  = canvas.clientWidth  * multiplier | 0;
+function resizeCanvasToDisplaySize(canvas: HTMLCanvasElement, multiplier: number = 1) {
+    const width = canvas.clientWidth * multiplier | 0;
     const height = canvas.clientHeight * multiplier | 0;
-    if (canvas.width !== width ||  canvas.height !== height) {
-      canvas.width  = width;
-      canvas.height = height;
-      return true;
+    if (canvas.width !== width || canvas.height !== height) {
+        canvas.width = width;
+        canvas.height = height;
+        return true;
     }
     return false;
-  }
+}
 
 type MessageBlock = {
     text: string,
