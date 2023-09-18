@@ -88,8 +88,22 @@ export class Game {
     player: Player = new Player();
     controls: Controls = new Controls();
     bullets: Bullet[] = [];
-    enemies: Enemy[] = [new Enemy(5), new Enemy(6), new Enemy(7), new Enemy(8), new Enemy(9), new Enemy(10), new Enemy(11), new Enemy(12)]
+    enemies: Enemy[] = messageToEnemies([
+        {
+            text: "PRESS ",
+            color: 0
+        },
+        {
+            text: "SPACE ",
+            color: 1
+        },
+        {
+            text: "TO FIRE",
+            color: 0
+        }
+    ]);
     stars: Star[] = [];
+    particles: Particle[] = [];
 
     constructor() {
         for (let i = 0; i < 100; i++) {
@@ -113,13 +127,32 @@ export class Game {
             this.bullets.push(new Bullet(this.player.x + 7, this.player.y));
         }
 
-        this.bullets.forEach((bullet) => bullet.tick());
-        this.bullets = this.bullets.filter((bullet) => bullet.isOnScreen());
-
         const tmp = this.tickCount % 256;
-        let offset = (tmp < 128 ? tmp : 256 - tmp) / 4 - 32;
+        let offset = (tmp < 128 ? tmp : 256 - tmp) / 4 - 16;
 
         this.enemies.forEach((enemy) => enemy.updatePosition(offset));
+
+        this.bullets.forEach((bullet) => {
+            bullet.tick();
+            const hit = this.enemies.find((enemy) => enemy.isHit(bullet.x, bullet.y));
+            if (hit) {
+                bullet.dead = true;
+                this.enemies = this.enemies.filter((enemy) => enemy !== hit);
+                this.createExplosion(hit.x + 4, hit.y + 4, hit.spriteX);
+            }
+        });
+        this.bullets = this.bullets.filter((bullet) => bullet.isLive());
+
+        this.particles.forEach((particles) => particles.tick());
+        this.particles = this.particles.filter((particle) => !particle.dead);
+    }
+
+    createExplosion(x: number, y: number, color: number) {
+        for (let i = 0; i < 8; i++) {
+            const angle = Math.PI / 3 * Math.random() - Math.PI / 1.5;
+            const velocity = Math.random() / 2 + .5;
+            this.particles.push(new Particle(x + Math.random() * 2, y + Math.random() * 2, velocity * Math.cos(angle), velocity * Math.sin(angle), color));
+        }
     }
 }
 
@@ -141,18 +174,29 @@ class Player extends Sprite {
 
 class Enemy extends Sprite {
     column: number;
+    spriteY: number;
+    spriteX: number;
 
-    constructor(column: number) {
-        super(0, 1 * 8);
+    constructor(column: number, spriteY: number, spriteX: number) {
+        super(0, 16 * 8);
         this.column = column;
+        this.spriteY = spriteY;
+        this.spriteX = spriteX;
     }
 
     updatePosition(offset:number) {
         this.x = offset + 8 * this.column;
     }
+
+    isHit(x: number, y: number): boolean {
+        return x >= this.x && x < this.x + 8
+            && y >= this.y && y < this.y + 8;
+    }
 }
 
 class Bullet extends Sprite {
+    dead: boolean = false;
+
     constructor(x: number, y: number) {
         super(x, y);
     }
@@ -161,8 +205,8 @@ class Bullet extends Sprite {
         this.y -= 5;
     }
 
-    isOnScreen() {
-        return this.y > 0 && this.y < BOARD_HEIGHT;
+    isLive() {
+        return this.y > 0 && this.y < BOARD_HEIGHT && !this.dead;
     }
 }
 
@@ -172,6 +216,26 @@ class Star extends Sprite {
     constructor() {
         super(Math.floor(Math.random() * BOARD_WIDTH), Math.floor(Math.random() * BOARD_HEIGHT));
         this.depth = Math.floor(Math.random() * 3);
+    }
+}
+
+class Particle extends Sprite {
+    vx: number;
+    vy: number;
+    color: number;
+    dead: boolean = false;
+
+    constructor(x: number, y: number, vx: number, vy: number, color: number) {
+        super(x, y);
+        this.vx = vx;
+        this.vy = vy;
+        this.color = color;
+    }
+
+    tick() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.dead = this.x < 0 || this.x > BOARD_WIDTH || this.y < 0 || this.y > BOARD_HEIGHT;
     }
 }
 
@@ -326,10 +390,15 @@ function init() {
             ctx.fillRect(Math.round(bullet.x), Math.round(bullet.y), 2, 6);
         }
 
-        // ctx.fillStyle = 'gray';
+        for (const particle of game.particles) {
+            ctx.fillStyle = ['white', '#07FFFF'][particle.color];
+
+            ctx.fillRect(Math.round(particle.x) - 1, Math.round(particle.y) - 1, 2, 2);
+        }
+
         let i = 0;
         for (const enemy of game.enemies) {
-            ctx.drawImage(spritesImage, i < 4 ? 0 : 8, i * 8, 8, 8, Math.round(enemy.x), Math.round(enemy.y), 8, 8);
+            ctx.drawImage(spritesImage, enemy.spriteX * 8, enemy.spriteY * 8, 8, 8, Math.round(enemy.x), Math.round(enemy.y), 8, 8);
             i++;
         }
     }
@@ -415,5 +484,28 @@ function resizeCanvasToDisplaySize(canvas, multiplier) {
     }
     return false;
   }
+
+type MessageBlock = {
+    text: string,
+    color: number
+};
+
+function messageToEnemies(message: MessageBlock[]): Enemy[] {
+    const result: Enemy[] = [];
+    const totalLength = message.reduce((sum, mb) => sum + mb.text.length, 0);
+    let i = Math.floor((28 - totalLength) / 2);
+    for (const mb of message) {
+        for (const letter of mb.text) {
+            if (letter === ' ') {
+                i++;
+                continue;
+            }
+            const y = letter.charCodeAt(0) - 'A'.charCodeAt(0);
+            result.push(new Enemy(i, y, mb.color));
+            i++;
+        }
+    }
+    return result;
+}
 
 init();
