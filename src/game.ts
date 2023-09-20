@@ -6,6 +6,7 @@ export class Game {
     player: Player = new Player();
     controls: Controls = new Controls();
     bullets: Bullet[] = [];
+    enemyBullets: Bullet[] = [];
     enemies: Enemy[] = getEnemies();
     stars: Star[] = [];
     particles: Particle[] = [];
@@ -19,20 +20,26 @@ export class Game {
     tick() {
         this.tickCount++;
 
-        if (this.controls.left) {
+        if (this.controls.left && this.player.mode !== "dead") {
             this.player.x -= 2;
             if (this.player.x < 0) this.player.x = 0;
         }
-        if (this.controls.right) {
+        if (this.controls.right && this.player.mode !== "dead") {
             this.player.x += 2;
             if (this.player.x > BOARD_WIDTH - 16) this.player.x = BOARD_WIDTH - 16;
         }
-        if (this.controls.fire) {
-            this.controls.fire = false;
+        if (this.controls.fire && this.player.mode === "alive") {
             this.bullets.push(new Bullet(this.player.x + 7, this.player.y));
         }
+        this.controls.fire = false;
+        this.player.tick(this.tickCount);
 
-        this.enemies.forEach((enemy) => enemy.tick(this.tickCount));
+        this.enemies.forEach((enemy) => {
+            enemy.tick(this.tickCount);
+            if (enemy.fireCountdown === 0) {
+                this.enemyBullets.push(new Bullet(enemy.x + 3, enemy.y + 8, 2));
+            }
+        });
 
         this.bullets.forEach((bullet) => {
             bullet.tick();
@@ -40,16 +47,26 @@ export class Game {
             if (hit) {
                 bullet.dead = true;
                 this.enemies = this.enemies.filter((enemy) => enemy !== hit);
-                this.createExplosion(hit.x + 4, hit.y + 4, hit.spriteX);
+                this.createExplosion1(hit.x + 4, hit.y + 4, hit.spriteX);
+                this.player.score += 10;
             }
         });
         this.bullets = this.bullets.filter((bullet) => bullet.isLive());
+
+        this.enemyBullets.forEach((bullet) => {
+            bullet.tick();
+            if (this.player.isHit(bullet.x, bullet.y) && this.player.kill(this.tickCount)) {
+                bullet.dead = true;
+                this.createExplosion2(this.player.x + 8, this.player.y + 4);
+            }
+        });
+        this.enemyBullets = this.enemyBullets.filter((bullet) => bullet.isLive());
 
         this.particles.forEach((particles) => particles.tick());
         this.particles = this.particles.filter((particle) => !particle.dead);
     }
 
-    createExplosion(x: number, y: number, color: number) {
+    createExplosion1(x: number, y: number, color: number) {
         for (let i = 0; i < 8; i++) {
             const angle = (Math.PI / 3) * Math.random() - Math.PI / 1.5;
             const velocity = Math.random() / 2 + 1;
@@ -60,6 +77,22 @@ export class Game {
                     velocity * Math.cos(angle),
                     velocity * Math.sin(angle),
                     color
+                )
+            );
+        }
+    }
+
+    createExplosion2(x: number, y: number) {
+        for (let i = 0; i < 16; i++) {
+            const angle = 2 * Math.PI * Math.random();
+            const velocity = Math.random() / 2 + 1;
+            this.particles.push(
+                new Particle(
+                    x + Math.random() * 2,
+                    y + Math.random() * 2,
+                    velocity * Math.cos(angle),
+                    velocity * Math.sin(angle),
+                    0
                 )
             );
         }
@@ -77,8 +110,45 @@ class Sprite {
 }
 
 class Player extends Sprite {
+    lives: number = 5;
+    mode: string = "alive";
+    deathTickCount?: number;
+    score: number = 0;
+
     constructor() {
-        super(13 * 8, 34 * 8);
+        super(13 * 8, 33 * 8);
+    }
+
+    tick(tickCount: number) {
+        const DEAD_TICKS = 60;
+        const IFRAME_TICKS = 120;
+
+        switch (this.mode) {
+            case "dead":
+                if (this.deathTickCount! + DEAD_TICKS <= tickCount) this.mode = "iframe";
+                if (this.lives === 0) {
+                    this.lives = 5;
+                    this.score = 0;
+                }
+                break;
+            case "iframe":
+                if (this.deathTickCount! + DEAD_TICKS + IFRAME_TICKS <= tickCount)
+                    this.mode = "alive";
+                break;
+        }
+    }
+
+    kill(tickCount: number) {
+        if (this.mode !== "alive") return false;
+
+        this.mode = "dead";
+        this.lives--;
+        this.deathTickCount = tickCount;
+        return true;
+    }
+
+    isHit(x: number, y: number): boolean {
+        return x >= this.x && x < this.x + 16 && y >= this.y && y < this.y + 8;
     }
 }
 
@@ -87,6 +157,7 @@ class Enemy extends Sprite {
     column: number;
     spriteY: number;
     spriteX: number;
+    fireCountdown: number = 1;
     private mode: string = "waiting";
     private targetY?: number;
     private targetX?: number;
@@ -112,6 +183,13 @@ class Enemy extends Sprite {
             y: 0,
         };
 
+        if (this.mode !== "waiting") {
+            if ((this.fireCountdown ?? -1) < 0) {
+                this.fireCountdown = Math.floor(Math.random() * 60 * 15) + 60 * 5;
+            }
+
+            this.fireCountdown--;
+        }
         switch (this.mode) {
             case "waiting":
                 if (this.calculateY(tickCount) < START_Y) {
@@ -153,13 +231,15 @@ class Enemy extends Sprite {
 
 class Bullet extends Sprite {
     dead: boolean = false;
+    velocity: number;
 
-    constructor(x: number, y: number) {
+    constructor(x: number, y: number, velocity: number = -5) {
         super(x, y);
+        this.velocity = velocity;
     }
 
     tick() {
-        this.y -= 5;
+        this.y += this.velocity;
     }
 
     isLive() {
@@ -213,7 +293,7 @@ function getEnemies(): Enemy[] {
 *Andy ONeill*
 
 *Space* to fire
-*x* and *x* to move
+*Arrows* to move
 
 I am a
 software engineer
