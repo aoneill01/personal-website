@@ -1,4 +1,4 @@
-import { BOARD_HEIGHT } from "./game";
+import { BOARD_HEIGHT, Game } from "./game.ts";
 
 const vs = `
 attribute vec4 a_position;
@@ -16,6 +16,7 @@ void main() {
 const fs = `
 precision highp float;
 uniform vec2 u_resolution;
+uniform float u_tickcount;
 
 varying vec2 v_texcoord;
 
@@ -23,7 +24,8 @@ uniform sampler2D u_texture;
 
 vec3 scanline(vec2 coord, vec3 screen)
 {
-	screen.rgb -= sin(2.0 * 3.1415 * (coord.y + 0.25)) * 0.15;
+    float intensity = 0.2 * (.75 + 0.25 * sin((coord.y + 2.0 * u_tickcount) / 30.0));
+	screen.rgb -= sin(2.0 * 3.1415 * (coord.y + 0.25)) * intensity;
 	return screen;
 }
 
@@ -46,10 +48,11 @@ vec2 crt(vec2 coord, float bend)
 
 vec3 sampleSplit(sampler2D tex, vec2 coord)
 {
+    float intensity = 0.015 * (.75 + 0.25 * sin((coord.y + 2.0 * u_tickcount) / 30.0));
 	vec3 frag;
-	frag.r = texture2D(tex, vec2(coord.x - 0.015 * (coord.x - 0.5), coord.y)).r;
+	frag.r = texture2D(tex, vec2(coord.x - intensity * (coord.x - 0.5), coord.y)).r;
 	frag.g = texture2D(tex, vec2(coord.x, coord.y)).g;
-	frag.b = texture2D(tex, vec2(coord.x + 0.015 * (coord.x - 0.5), coord.y)).b;
+	frag.b = texture2D(tex, vec2(coord.x + intensity * (coord.x - 0.5), coord.y)).b;
 	return frag;
 }
 
@@ -71,7 +74,7 @@ void main() {
 export function initGl(
     screenCanvas: HTMLCanvasElement,
     textureCanvas: HTMLCanvasElement
-): () => void {
+): (game: Game) => void {
     const gl = screenCanvas.getContext("webgl")!;
     // TODO !gl
 
@@ -86,6 +89,8 @@ export function initGl(
 
     // look up uniform locations
     const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
+
+    const tickCountLocation = gl.getUniformLocation(program, "u_tickcount");
 
     // Create a buffer to put three 2d clip space points in
     const positionBuffer = gl.createBuffer();
@@ -113,7 +118,7 @@ export function initGl(
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
-    return function drawGl() {
+    return function drawGl(game: Game) {
         gl.bindTexture(gl.TEXTURE_2D, canvasTex);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureCanvas);
         resizeCanvasToDisplaySize(<HTMLCanvasElement>gl.canvas);
@@ -134,6 +139,7 @@ export function initGl(
         gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
 
         gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height);
+        gl.uniform1f(tickCountLocation, game.tickCount);
 
         gl.drawArrays(gl.TRIANGLES, 0, 6);
     };

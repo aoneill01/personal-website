@@ -45,7 +45,7 @@ function init() {
         // Draw to hidden canvas
         drawTexture(game);
         // Draw to screen with shader effects
-        drawGl();
+        drawGl(game);
     }
 }
 

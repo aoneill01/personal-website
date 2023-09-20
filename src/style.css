@@ -28,7 +28,7 @@ body {
   display: flex;
   place-items: center;
   min-width: 320px;
-  min-height: 100vh;
+  min-height: 100dvh;
 
   background-color: black;
 }
@@ -38,7 +38,7 @@ body {
 }
 
 #screen {
-  height: 90vh;
+  height: 95dvh;
 }
 
 h1 {

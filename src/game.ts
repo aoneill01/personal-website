@@ -7,11 +7,16 @@ export class Game {
     controls: Controls = new Controls();
     bullets: Bullet[] = [];
     enemyBullets: Bullet[] = [];
-    enemies: Enemy[] = getEnemies();
+    enemies: Enemy[] = [];
+    enemyGenerator: Generator<Enemy[]>;
     stars: Star[] = [];
     particles: Particle[] = [];
 
     constructor() {
+        this.enemyGenerator = getEnemies();
+
+        this.enemies.push(...this.enemyGenerator.next().value);
+        this.enemies.push(...this.enemyGenerator.next().value);
         for (let i = 0; i < 100; i++) {
             this.stars.push(new Star());
         }
@@ -20,6 +25,12 @@ export class Game {
     tick() {
         this.tickCount++;
 
+        // Time to spawn more enemies
+        if (this.tickCount % (16 * 8) === 0) {
+            this.enemies.push(...this.enemyGenerator.next().value);
+        }
+
+        // Player controls
         if (this.controls.left && this.player.mode !== "dead") {
             this.player.x -= 2;
             if (this.player.x < 0) this.player.x = 0;
@@ -34,9 +45,10 @@ export class Game {
         this.controls.fire = false;
         this.player.tick(this.tickCount);
 
+        // Enemy logic
         this.enemies.forEach((enemy) => {
             enemy.tick(this.tickCount);
-            if (enemy.fireCountdown === 0) {
+            if (enemy.fireCountdown === 0 && this.enemyBullets.length < 8) {
                 this.enemyBullets.push(new Bullet(enemy.x + 3, enemy.y + 8, 2));
             }
             if (
@@ -49,6 +61,7 @@ export class Game {
         });
         this.enemies = this.enemies.filter((enemy) => enemy.isLive());
 
+        // Bullets
         this.bullets.forEach((bullet) => {
             bullet.tick();
             const hit = this.enemies.find((enemy) => enemy.isHit(bullet.x, bullet.y));
@@ -70,6 +83,7 @@ export class Game {
         });
         this.enemyBullets = this.enemyBullets.filter((bullet) => bullet.isLive());
 
+        // Explosion particles
         this.particles.forEach((particles) => particles.tick());
         this.particles = this.particles.filter((particle) => !particle.dead);
     }
@@ -319,9 +333,8 @@ type MessageBlock = {
     color: number;
 };
 
-function getEnemies(): Enemy[] {
-    const result = [];
-    const text = `Welcome My name is
+function* getEnemies(): Generator<Enemy[]> {
+    const text = `My name is
 *Andy ONeill*
 
 *Space* to fire
@@ -339,11 +352,9 @@ on *LinkedIn*
 I enjoy
 retro gaming
 mechanical keyboards
-electronics
+*programming*
 origami
-
-I worked at
-*Scratch*`.toUpperCase();
+`.toUpperCase();
 
     const lines = text.split("\n");
     for (let row = 0; row < lines.length; row++) {
@@ -357,10 +368,23 @@ I worked at
             });
             color = (color + 1) % 2;
         }
-        result.push(...messageToEnemies(message, row));
+        yield messageToEnemies(message, row);
     }
 
-    return result;
+    for (let row = lines.length; true; row += 2) {
+        let result = [];
+        for (let i = 2; i < 24; i += 4) {
+            result.push(new Enemy(row, i, 39, 0));
+            result.push(new Enemy(row, i + 2, 39, 1));
+        }
+        yield result;
+        result = [];
+        for (let i = 3; i < 24; i += 4) {
+            result.push(new Enemy(row + 1, i, 39, 0));
+            result.push(new Enemy(row + 1, i + 2, 39, 1));
+        }
+        yield result;
+    }
 }
 
 function messageToEnemies(message: MessageBlock[], row: number): Enemy[] {
