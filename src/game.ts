@@ -39,7 +39,15 @@ export class Game {
             if (enemy.fireCountdown === 0) {
                 this.enemyBullets.push(new Bullet(enemy.x + 3, enemy.y + 8, 2));
             }
+            if (
+                enemy.mode === "dive" &&
+                this.player.isHit(enemy.x + 4, enemy.y + 4) &&
+                this.player.kill(this.tickCount)
+            ) {
+                this.createExplosion2(this.player.x + 8, this.player.y + 4);
+            }
         });
+        this.enemies = this.enemies.filter((enemy) => enemy.isLive());
 
         this.bullets.forEach((bullet) => {
             bullet.tick();
@@ -158,9 +166,11 @@ class Enemy extends Sprite {
     spriteY: number;
     spriteX: number;
     fireCountdown: number = 1;
-    private mode: string = "waiting";
+    mode: string = "waiting";
     private targetY?: number;
     private targetX?: number;
+    private startY?: number;
+    private startX?: number;
     private startTickCount?: number;
 
     constructor(row: number, column: number, spriteY: number, spriteX: number) {
@@ -174,6 +184,7 @@ class Enemy extends Sprite {
     tick(tickCount: number) {
         const START_Y = 23 * 8;
         const FLY_IN_TICKS = 100;
+        const DIVE_TICKS = 200;
         const P1 = {
             x: this.row % 2 === 0 ? -8 : BOARD_WIDTH,
             y: 8 * 4,
@@ -182,6 +193,7 @@ class Enemy extends Sprite {
             x: this.row % 2 === 0 ? BOARD_WIDTH : 0,
             y: 0,
         };
+        let t;
 
         if (this.mode !== "waiting") {
             if ((this.fireCountdown ?? -1) < 0) {
@@ -201,7 +213,7 @@ class Enemy extends Sprite {
 
                 break;
             case "flyIn":
-                const t = (tickCount - this.startTickCount!) / FLY_IN_TICKS;
+                t = (tickCount - this.startTickCount!) / FLY_IN_TICKS;
                 this.y = (1 - t) ** 2 * P1.y + 2 * (1 - t) * t * P2.y + t ** 2 * this.targetY!;
                 this.x = (1 - t) ** 2 * P1.x + 2 * (1 - t) * t * P2.x + t ** 2 * this.targetX!;
                 if (t >= 1) this.mode = "group";
@@ -209,6 +221,22 @@ class Enemy extends Sprite {
             case "group":
                 this.y = this.calculateY(tickCount);
                 this.x = this.calculateX(tickCount);
+                if (this.y - this.column <= 8) {
+                    this.mode = "dive";
+                    this.startTickCount = tickCount;
+                    this.startX = this.x;
+                    this.startY = this.y;
+                    this.targetX = Math.random() * BOARD_WIDTH;
+                    this.targetY = BOARD_HEIGHT;
+                }
+                break;
+            case "dive":
+                t = (tickCount - this.startTickCount!) / DIVE_TICKS;
+                this.y =
+                    (1 - t) ** 2 * this.startY! + 2 * (1 - t) * t * P1.y + t ** 2 * this.targetY!;
+                this.x =
+                    (1 - t) ** 2 * this.startX! + 2 * (1 - t) * t * P1.x + t ** 2 * this.targetX!;
+                if (t > 1) this.mode = "dead";
                 break;
         }
     }
@@ -226,6 +254,10 @@ class Enemy extends Sprite {
         const slowedCount = Math.floor(tickCount / 4);
         const remainder = slowedCount % 64;
         return (remainder < 32 ? remainder : 64 - remainder) - 16 + 8 * this.column;
+    }
+
+    isLive() {
+        return this.mode !== "dead";
     }
 }
 
