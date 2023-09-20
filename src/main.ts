@@ -15,6 +15,7 @@ function init() {
                 game.controls.right = true;
                 break;
             case " ":
+                ev.preventDefault();
                 if (!ev.repeat) game.controls.fire = true;
                 break;
         }

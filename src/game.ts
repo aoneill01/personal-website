@@ -1,5 +1,13 @@
+import explosionWav from "./explosion.wav";
+import laserShootWav from "./laserShoot.wav";
+import hitHurtWav from "./hitHurt.wav";
+
 export const BOARD_WIDTH = 28 * 8;
 export const BOARD_HEIGHT = 36 * 8;
+
+const explosion = new Audio(explosionWav);
+const laserShoot = new Audio(laserShootWav);
+const hitHurt = new Audio(hitHurtWav);
 
 export class Game {
     tickCount: number = 0;
@@ -41,6 +49,7 @@ export class Game {
         }
         if (this.controls.fire && this.player.mode === "alive") {
             this.bullets.push(new Bullet(this.player.x + 7, this.player.y));
+            laserShoot.play();
         }
         this.controls.fire = false;
         this.player.tick(this.tickCount);
@@ -70,6 +79,7 @@ export class Game {
                 this.enemies = this.enemies.filter((enemy) => enemy !== hit);
                 this.createExplosion1(hit.x + 4, hit.y + 4, hit.spriteX);
                 this.player.score += 10;
+                hitHurt.play();
             }
         });
         this.bullets = this.bullets.filter((bullet) => bullet.isLive());
@@ -166,6 +176,7 @@ class Player extends Sprite {
         this.mode = "dead";
         this.lives--;
         this.deathTickCount = tickCount;
+        explosion.play();
         return true;
     }
 
@@ -256,6 +267,7 @@ class Enemy extends Sprite {
     }
 
     isHit(x: number, y: number): boolean {
+        if (this.mode === "flyIn") return false;
         return x >= this.x && x < this.x + 8 && y >= this.y && y < this.y + 8;
     }
 
