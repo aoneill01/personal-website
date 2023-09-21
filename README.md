@@ -1,3 +1,5 @@
-Starting work on a personal website. The concept is to have a retro-inspired shooter present my personal information. I will add more information here when it is ready...
+Retro-inspired space shooter where you can learn a bit about me, Andy O'Neill.
 
-[https://aoneill01.github.io/personal-website/](https://aoneill01.github.io/personal-website/)
+[about.aoneill.com](http://about.aoneill.com/)
+
+![Screenshot](screenshot.png)
