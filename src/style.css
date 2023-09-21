@@ -26,11 +26,28 @@ a:hover {
 body {
   margin: 0;
   display: flex;
+  flex-direction: column;
   place-items: center;
   min-height: 100dvh;
 
   background-color: black;
   overflow: hidden;
+}
+
+footer {
+  display: flex;
+  gap: 1em;
+}
+
+footer img {
+  height: 32px;
+  max-height: 5dvh;
+  display: block;
+  opacity: 0.3;
+}
+
+img.show {
+  animation: blink .5s linear 5 forwards;
 }
 
 #texture {
@@ -39,10 +56,29 @@ body {
 
 #screen {
   height: 95dvh;
-  max-width: 100dvw;
+  max-height: 133dvw;
   aspect-ratio: 3 / 4;
+  display: block;
 }
 
 main {
   margin: 0 auto;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1.0;
+  }
+  49% {
+    opacity: 1.0;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  99% {
+    opacity: 0.3
+  }
+  100% {
+    opacity: 1.0;
+  }
 }

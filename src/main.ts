@@ -15,6 +15,7 @@ function init() {
                 game.controls.right = true;
                 break;
             case " ":
+                console.log(game.tickCount);
                 ev.preventDefault();
                 if (!ev.repeat) game.controls.fire = true;
                 break;
@@ -47,7 +48,19 @@ function init() {
         drawTexture(game);
         // Draw to screen with shader effects
         drawGl(game);
+
+        if (game.tickCount === 2395) {
+            document.getElementById("github")?.classList.add("show");
+        }
+        if (game.tickCount === 3150) {
+            document.getElementById("linkedin")?.classList.add("show");
+        }
+        if (game.tickCount === 4415) {
+            document.getElementById("scratch")?.classList.add("show");
+        }
     }
+
+    console.log("👋 Welcome to my website! 👋");
 }
 
 init();

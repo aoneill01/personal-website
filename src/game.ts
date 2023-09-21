@@ -346,11 +346,11 @@ type MessageBlock = {
 };
 
 function* getEnemies(): Generator<Enemy[]> {
-    const text = `My name is
+    const text = `Hi I am
 *Andy ONeill*
 
 *Space* to fire
-*Arrows* to move
+< and > to move
 
 I am a
 software engineer
@@ -358,7 +358,7 @@ software engineer
 Check out my code
 on *Github*
 
-Find more info
+Find career info
 on *LinkedIn*
 
 I enjoy
@@ -366,6 +366,9 @@ retro gaming
 mechanical keyboards
 *programming*
 origami
+
+All your base are 
+belong to us
 `.toUpperCase();
 
     const lines = text.split("\n");
@@ -384,6 +387,11 @@ origami
     }
 
     for (let row = lines.length; true; row += 2) {
+        if (row === lines.length + 20) {
+            yield messageToEnemies([{ text: "ARE YOU", color: 0 }], row);
+            yield messageToEnemies([{ text: "STILL HERE", color: 0 }], row + 1);
+            continue;
+        }
         let result = [];
         for (let i = 2; i < 24; i += 4) {
             result.push(new Enemy(row, i, 39, 0));
@@ -409,8 +417,17 @@ function messageToEnemies(message: MessageBlock[], row: number): Enemy[] {
                 i++;
                 continue;
             }
-            const y = letter.charCodeAt(0) - "A".charCodeAt(0);
-            result.push(new Enemy(row, i, y, mb.color));
+            let color = mb.color;
+            let y = letter.charCodeAt(0) - "A".charCodeAt(0);
+            if (letter === "<") {
+                color = 0;
+                y = 26;
+            }
+            if (letter === ">") {
+                color = 1;
+                y = 26;
+            }
+            result.push(new Enemy(row, i, y, color));
             i++;
         }
     }
