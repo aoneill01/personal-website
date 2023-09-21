@@ -367,8 +367,8 @@ mechanical keyboards
 *programming*
 origami
 
-All your base are 
-belong to us
+All your base 
+are belong to us
 `.toUpperCase();
 
     const lines = text.split("\n");
