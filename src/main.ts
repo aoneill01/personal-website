@@ -73,8 +73,8 @@ function init() {
         }
     }
 
-    console.log("👋 Welcome to my website! 👋");
-    console.log("[ try running window.cheatMode() ]");
+    console.log("%c👋 Welcome to my website! 👋", "font-size: 20px");
+    console.log("%ctry running window.cheatMode()", "color: grey");
 }
 
 init();

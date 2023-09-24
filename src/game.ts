@@ -1,6 +1,6 @@
-import explosionWav from "./explosion.wav";
-import laserShootWav from "./laserShoot.wav";
-import hitHurtWav from "./hitHurt.wav";
+import explosionWav from "./sounds/explosion.wav";
+import laserShootWav from "./sounds/laserShoot.wav";
+import hitHurtWav from "./sounds/hitHurt.wav";
 
 export const BOARD_WIDTH = 28 * 8;
 export const BOARD_HEIGHT = 36 * 8;

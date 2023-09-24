@@ -1,5 +1,5 @@
 import { BOARD_HEIGHT, BOARD_WIDTH, Game } from "./game.ts";
-import sprites from "./sprites.png";
+import sprites from "./images/sprites.png";
 
 // Sprite sheet of graphics.
 // Should probably wait for it to load, but it is small.
@@ -9,7 +9,7 @@ spritesImage.src = sprites;
 export function initTexture(textureCanvas: HTMLCanvasElement): (game: Game) => void {
     const ctx = textureCanvas.getContext("2d")!;
 
-    return function draw(game: Game) {
+    return function drawTexture(game: Game) {
         // Clear the screen
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, BOARD_WIDTH, BOARD_HEIGHT);
@@ -27,7 +27,7 @@ export function initTexture(textureCanvas: HTMLCanvasElement): (game: Game) => v
         }
 
         // Bullets
-        ctx.fillStyle = "red";
+        ctx.fillStyle = "#FF0033";
         for (const bullet of game.bullets) {
             ctx.fillRect(Math.round(bullet.x), Math.round(bullet.y), 2, 6);
         }
