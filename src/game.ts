@@ -19,6 +19,7 @@ export class Game {
     enemyGenerator: Generator<Enemy[]>;
     stars: Star[] = [];
     particles: Particle[] = [];
+    turbo: boolean = false;
 
     constructor() {
         this.enemyGenerator = getEnemies();
@@ -48,7 +49,12 @@ export class Game {
             if (this.player.x > BOARD_WIDTH - 16) this.player.x = BOARD_WIDTH - 16;
         }
         if (this.controls.fire && this.player.mode === "alive") {
-            this.bullets.push(new Bullet(this.player.x + 7, this.player.y));
+            if (this.turbo) {
+                this.bullets.push(new Bullet(this.player.x, this.player.y));
+                this.bullets.push(new Bullet(this.player.x + 13, this.player.y));
+            } else {
+                this.bullets.push(new Bullet(this.player.x + 7, this.player.y));
+            }
             laserShoot.play();
         }
         this.controls.fire = false;
@@ -366,9 +372,6 @@ retro gaming
 mechanical keyboards
 *programming*
 origami
-
-All your base 
-are belong to us
 `.toUpperCase();
 
     const lines = text.split("\n");
@@ -387,6 +390,11 @@ are belong to us
     }
 
     for (let row = lines.length; true; row += 2) {
+        if (row === lines.length + 4) {
+            yield messageToEnemies([{ text: "ALL YOUR BASE", color: 0 }], row);
+            yield messageToEnemies([{ text: "ARE BELONG TO US", color: 0 }], row + 1);
+            continue;
+        }
         if (row === lines.length + 20) {
             yield messageToEnemies([{ text: "ARE YOU", color: 0 }], row);
             yield messageToEnemies([{ text: "STILL HERE", color: 0 }], row + 1);

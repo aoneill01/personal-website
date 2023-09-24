@@ -24,8 +24,8 @@ uniform sampler2D u_texture;
 
 vec3 scanline(vec2 coord, vec3 screen)
 {
-    float intensity = 0.2 * (.75 + 0.25 * sin((coord.y + 2.0 * u_tickcount) / 30.0));
-	screen.rgb -= sin(2.0 * 3.1415 * (coord.y + 0.25)) * intensity;
+    float intensity = 0.3 * (.75 + 0.25 * sin((coord.y + 2.0 * u_tickcount) / 30.0));
+	screen.rgb -= (0.3 + sin(2.0 * 3.1415 * (coord.y + 0.25))) * intensity;
 	return screen;
 }
 
@@ -48,11 +48,11 @@ vec2 crt(vec2 coord, float bend)
 
 vec3 sampleSplit(sampler2D tex, vec2 coord)
 {
-    float intensity = 0.015 * (.75 + 0.25 * sin((coord.y + 2.0 * u_tickcount) / 30.0));
+    float intensity = 0.012 * (.8 + 0.2 * sin((coord.y + 2.0 * u_tickcount) / 30.0));
 	vec3 frag;
-	frag.r = texture2D(tex, vec2(coord.x - intensity * (coord.x - 0.5), coord.y)).r;
+	frag.r = texture2D(tex, vec2(coord.x - intensity * (0.5), coord.y)).r;
 	frag.g = texture2D(tex, vec2(coord.x, coord.y)).g;
-	frag.b = texture2D(tex, vec2(coord.x + intensity * (coord.x - 0.5), coord.y)).b;
+	frag.b = texture2D(tex, vec2(coord.x + intensity * (0.5), coord.y)).b;
 	return frag;
 }
 

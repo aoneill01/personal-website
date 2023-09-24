@@ -3,6 +3,12 @@ import { Game } from "./game.ts";
 import { initTexture } from "./texture.ts";
 import { initGl } from "./web-gl.ts";
 
+declare global {
+    interface Window {
+        secret: any;
+    }
+}
+
 function init() {
     const game = new Game();
 
@@ -15,7 +21,6 @@ function init() {
                 game.controls.right = true;
                 break;
             case " ":
-                console.log(game.tickCount);
                 ev.preventDefault();
                 if (!ev.repeat) game.controls.fire = true;
                 break;
@@ -32,6 +37,11 @@ function init() {
                 break;
         }
     });
+
+    window.secret = () => {
+        game.turbo = true;
+        console.log("DUAL LASERS ENABLED");
+    };
 
     const textureCanvas = <HTMLCanvasElement>document.getElementById("texture");
     const screenCanvas = <HTMLCanvasElement>document.getElementById("screen");
@@ -61,6 +71,7 @@ function init() {
     }
 
     console.log("👋 Welcome to my website! 👋");
+    console.log("[ try running window.secret() ]");
 }
 
 init();
