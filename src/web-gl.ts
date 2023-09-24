@@ -1,4 +1,4 @@
-import { BOARD_HEIGHT, Game } from "./game.ts";
+import { BOARD_HEIGHT, BOARD_WIDTH, Game } from "./game.ts";
 
 const vs = `
 attribute vec4 a_position;
@@ -24,7 +24,8 @@ uniform sampler2D u_texture;
 
 vec3 scanline(vec2 coord, vec3 screen)
 {
-    float intensity = 0.3 * (.75 + 0.25 * sin((coord.y + 2.0 * u_tickcount) / 30.0));
+    float intensity = 0.4 * (.75 + 0.25 * sin((coord.y + 2.0 * u_tickcount) / 30.0)) * 
+      (1.0 + 0.1 *sin(2.0 * 3.1415 * (coord.x + 0.25)));
 	screen.rgb -= (0.3 + sin(2.0 * 3.1415 * (coord.y + 0.25))) * intensity;
 	return screen;
 }
@@ -66,7 +67,7 @@ void main() {
   gl_FragColor.a = 1.0;// = vec4(0.0, 0.0, 0.0, 1.0);
   gl_FragColor.rgb = sampleSplit(u_texture, crtCoords);
 
-  vec2 screenSpace = crtCoords * ${BOARD_HEIGHT}.0;
+  vec2 screenSpace = crtCoords * vec2(${BOARD_WIDTH}.0,${BOARD_HEIGHT}.0);
   gl_FragColor.rgb = scanline(screenSpace, gl_FragColor.rgb);
 }
 `;

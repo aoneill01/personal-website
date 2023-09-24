@@ -20,6 +20,7 @@ export class Game {
     stars: Star[] = [];
     particles: Particle[] = [];
     turbo: boolean = false;
+    fireCountdown: number = 0;
 
     constructor() {
         this.enemyGenerator = getEnemies();
@@ -48,7 +49,7 @@ export class Game {
             this.player.x += 2;
             if (this.player.x > BOARD_WIDTH - 16) this.player.x = BOARD_WIDTH - 16;
         }
-        if (this.controls.fire && this.player.mode === "alive") {
+        if (this.controls.fire && this.player.mode === "alive" && this.fireCountdown <= 0) {
             if (this.turbo) {
                 this.bullets.push(new Bullet(this.player.x, this.player.y));
                 this.bullets.push(new Bullet(this.player.x + 13, this.player.y));
@@ -56,8 +57,12 @@ export class Game {
                 this.bullets.push(new Bullet(this.player.x + 7, this.player.y));
             }
             laserShoot.play();
+            this.fireCountdown = 6;
         }
-        this.controls.fire = false;
+
+        this.fireCountdown--;
+        if (!this.turbo) this.controls.fire = false;
+
         this.player.tick(this.tickCount);
 
         // Enemy logic

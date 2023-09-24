@@ -78,21 +78,29 @@ export function initTexture(textureCanvas: HTMLCanvasElement): (game: Game) => v
             );
         }
 
-        for (let i = 0; i < game.player.lives - 1; i++) {
+        for (let i = 0; i < 4; i++) {
+            ctx.save();
+            if (i >= game.player.lives - 1) ctx.globalAlpha = 0.1;
+
             ctx.drawImage(spritesImage, 0, 38 * 8, 8, 8, 16 + i * 10, 35 * 8, 8, 8);
+            ctx.restore();
         }
 
         // Free play
+
+        ctx.save();
         if (Math.floor(game.tickCount / 32) % 2 === 0) {
-            ctx.drawImage(spritesImage, 8, 5 * 8, 8, 8, 10 * 8 - 4, 35 * 8 - 4, 8, 8);
-            ctx.drawImage(spritesImage, 8, 17 * 8, 8, 8, 11 * 8 - 4, 35 * 8 - 4, 8, 8);
-            ctx.drawImage(spritesImage, 8, 4 * 8, 8, 8, 12 * 8 - 4, 35 * 8 - 4, 8, 8);
-            ctx.drawImage(spritesImage, 8, 4 * 8, 8, 8, 13 * 8 - 4, 35 * 8 - 4, 8, 8);
-            ctx.drawImage(spritesImage, 8, 15 * 8, 8, 8, 15 * 8 - 4, 35 * 8 - 4, 8, 8);
-            ctx.drawImage(spritesImage, 8, 11 * 8, 8, 8, 16 * 8 - 4, 35 * 8 - 4, 8, 8);
-            ctx.drawImage(spritesImage, 8, 0 * 8, 8, 8, 17 * 8 - 4, 35 * 8 - 4, 8, 8);
-            ctx.drawImage(spritesImage, 8, 24 * 8, 8, 8, 18 * 8 - 4, 35 * 8 - 4, 8, 8);
+            ctx.globalAlpha = 0.1;
         }
+        ctx.drawImage(spritesImage, 8, 5 * 8, 8, 8, 10 * 8 - 4, 35 * 8 - 4, 8, 8);
+        ctx.drawImage(spritesImage, 8, 17 * 8, 8, 8, 11 * 8 - 4, 35 * 8 - 4, 8, 8);
+        ctx.drawImage(spritesImage, 8, 4 * 8, 8, 8, 12 * 8 - 4, 35 * 8 - 4, 8, 8);
+        ctx.drawImage(spritesImage, 8, 4 * 8, 8, 8, 13 * 8 - 4, 35 * 8 - 4, 8, 8);
+        ctx.drawImage(spritesImage, 8, 15 * 8, 8, 8, 15 * 8 - 4, 35 * 8 - 4, 8, 8);
+        ctx.drawImage(spritesImage, 8, 11 * 8, 8, 8, 16 * 8 - 4, 35 * 8 - 4, 8, 8);
+        ctx.drawImage(spritesImage, 8, 0 * 8, 8, 8, 17 * 8 - 4, 35 * 8 - 4, 8, 8);
+        ctx.drawImage(spritesImage, 8, 24 * 8, 8, 8, 18 * 8 - 4, 35 * 8 - 4, 8, 8);
+        ctx.restore();
 
         // Score
         let tmp = game.player.score;

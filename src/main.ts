@@ -5,7 +5,7 @@ import { initGl } from "./web-gl.ts";
 
 declare global {
     interface Window {
-        secret: any;
+        cheatMode: () => void;
     }
 }
 
@@ -35,12 +35,15 @@ function init() {
             case "ArrowRight":
                 game.controls.right = false;
                 break;
+            case " ":
+                game.controls.fire = false;
+                break;
         }
     });
 
-    window.secret = () => {
+    window.cheatMode = () => {
         game.turbo = true;
-        console.log("DUAL LASERS ENABLED");
+        console.log("IT'S DANGEROUS TO GO ALONE! TAKE THIS.");
     };
 
     const textureCanvas = <HTMLCanvasElement>document.getElementById("texture");
@@ -71,7 +74,7 @@ function init() {
     }
 
     console.log("👋 Welcome to my website! 👋");
-    console.log("[ try running window.secret() ]");
+    console.log("[ try running window.cheatMode() ]");
 }
 
 init();
