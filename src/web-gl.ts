@@ -1,4 +1,4 @@
-import { BOARD_HEIGHT, BOARD_WIDTH, Game } from "./game.ts";
+import { SCREEEN_HEIGHT, SCREEN_WIDTH, Game } from "./game.ts";
 import vs from "./shaders/vertex.glsl?raw";
 import fs from "./shaders/fragment.glsl?raw";
 
@@ -69,7 +69,7 @@ export function initGl(
 
         gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height);
         gl.uniform1f(tickCountLocation, game.tickCount);
-        gl.uniform2f(dimensionsLocation, BOARD_WIDTH, BOARD_HEIGHT);
+        gl.uniform2f(dimensionsLocation, SCREEN_WIDTH, SCREEEN_HEIGHT);
 
         gl.drawArrays(gl.TRIANGLES, 0, 6);
     };

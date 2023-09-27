@@ -1,18 +1,33 @@
-import { BOARD_HEIGHT, BOARD_WIDTH, Game } from "./game.ts";
+import { SCREEEN_HEIGHT, SCREEN_WIDTH, Game, PlayerMode } from "./game.ts";
 import sprites from "./images/sprites.png";
 
 // Sprite sheet of graphics.
 // Should probably wait for it to load, but it is small.
 const spritesImage = new Image();
 spritesImage.src = sprites;
+const SPRITE_SIZE = 8;
 
 export function initTexture(textureCanvas: HTMLCanvasElement): (game: Game) => void {
     const ctx = textureCanvas.getContext("2d")!;
 
+    function drawSprite(column: number, row: number, dx: number, dy: number) {
+        ctx.drawImage(
+            spritesImage,
+            column * SPRITE_SIZE,
+            row * SPRITE_SIZE,
+            SPRITE_SIZE,
+            SPRITE_SIZE,
+            dx,
+            dy,
+            SPRITE_SIZE,
+            SPRITE_SIZE
+        );
+    }
+
     return function drawTexture(game: Game) {
         // Clear the screen
         ctx.fillStyle = "black";
-        ctx.fillRect(0, 0, BOARD_WIDTH, BOARD_HEIGHT);
+        ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEEN_HEIGHT);
 
         // Starfield background
         const colors = ["#887722", "#776611", "#665500"];
@@ -20,7 +35,7 @@ export function initTexture(textureCanvas: HTMLCanvasElement): (game: Game) => v
             ctx.fillStyle = colors[star.depth];
             ctx.fillRect(
                 star.x,
-                Math.floor((star.y + game.tickCount * (0.2 - 0.05 * star.depth)) % BOARD_HEIGHT),
+                Math.floor((star.y + game.tickCount * (0.2 - 0.05 * star.depth)) % SCREEEN_HEIGHT),
                 1,
                 1
             );
@@ -46,43 +61,25 @@ export function initTexture(textureCanvas: HTMLCanvasElement): (game: Game) => v
         // Enemies
         let i = 0;
         for (const enemy of game.enemies) {
-            ctx.drawImage(
-                spritesImage,
-                enemy.spriteX * 8,
-                enemy.spriteY * 8,
-                8,
-                8,
-                Math.round(enemy.x),
-                Math.round(enemy.y),
-                8,
-                8
-            );
+            drawSprite(enemy.spriteX, enemy.spriteY, Math.round(enemy.x), Math.round(enemy.y));
             i++;
         }
 
         // Player's ship
         if (
-            game.player.mode === "alive" ||
-            (game.player.mode === "iframe" && Math.floor(game.tickCount / 4) % 2 === 0)
+            game.player.mode === PlayerMode.Alive ||
+            (game.player.mode === PlayerMode.Iframe && Math.floor(game.tickCount / 4) % 2 === 0)
         ) {
-            ctx.drawImage(
-                spritesImage,
-                0,
-                37 * 8,
-                16,
-                8,
-                Math.round(game.player.x),
-                Math.round(game.player.y),
-                16,
-                8
-            );
+            drawSprite(0, 37, Math.round(game.player.x), Math.round(game.player.y));
+            drawSprite(1, 37, Math.round(game.player.x) + SPRITE_SIZE, Math.round(game.player.y));
         }
 
         for (let i = 0; i < 4; i++) {
             ctx.save();
             if (i >= game.player.lives - 1) ctx.globalAlpha = 0.1;
 
-            ctx.drawImage(spritesImage, 0, 38 * 8, 8, 8, 16 + i * 10, 35 * 8, 8, 8);
+            drawSprite(0, 38, 16 + i * 10, 35 * SPRITE_SIZE);
+
             ctx.restore();
         }
 
@@ -92,14 +89,15 @@ export function initTexture(textureCanvas: HTMLCanvasElement): (game: Game) => v
         if (Math.floor(game.tickCount / 32) % 2 === 0) {
             ctx.globalAlpha = 0.1;
         }
-        ctx.drawImage(spritesImage, 8, 5 * 8, 8, 8, 10 * 8 - 4, 35 * 8 - 4, 8, 8);
-        ctx.drawImage(spritesImage, 8, 17 * 8, 8, 8, 11 * 8 - 4, 35 * 8 - 4, 8, 8);
-        ctx.drawImage(spritesImage, 8, 4 * 8, 8, 8, 12 * 8 - 4, 35 * 8 - 4, 8, 8);
-        ctx.drawImage(spritesImage, 8, 4 * 8, 8, 8, 13 * 8 - 4, 35 * 8 - 4, 8, 8);
-        ctx.drawImage(spritesImage, 8, 15 * 8, 8, 8, 15 * 8 - 4, 35 * 8 - 4, 8, 8);
-        ctx.drawImage(spritesImage, 8, 11 * 8, 8, 8, 16 * 8 - 4, 35 * 8 - 4, 8, 8);
-        ctx.drawImage(spritesImage, 8, 0 * 8, 8, 8, 17 * 8 - 4, 35 * 8 - 4, 8, 8);
-        ctx.drawImage(spritesImage, 8, 24 * 8, 8, 8, 18 * 8 - 4, 35 * 8 - 4, 8, 8);
+        drawSprite(1, 5, 10 * SPRITE_SIZE - 4, 35 * SPRITE_SIZE - 4);
+        drawSprite(1, 17, 11 * SPRITE_SIZE - 4, 35 * SPRITE_SIZE - 4);
+        drawSprite(1, 4, 12 * SPRITE_SIZE - 4, 35 * SPRITE_SIZE - 4);
+        drawSprite(1, 4, 13 * SPRITE_SIZE - 4, 35 * SPRITE_SIZE - 4);
+        drawSprite(1, 15, 15 * SPRITE_SIZE - 4, 35 * SPRITE_SIZE - 4);
+        drawSprite(1, 11, 16 * SPRITE_SIZE - 4, 35 * SPRITE_SIZE - 4);
+        drawSprite(1, 0, 17 * SPRITE_SIZE - 4, 35 * SPRITE_SIZE - 4);
+        drawSprite(1, 24, 18 * SPRITE_SIZE - 4, 35 * SPRITE_SIZE - 4);
+
         ctx.restore();
 
         // Score
@@ -107,17 +105,8 @@ export function initTexture(textureCanvas: HTMLCanvasElement): (game: Game) => v
         let j = 0;
         while (j === 0 || tmp !== 0) {
             const ones = tmp % 10;
-            ctx.drawImage(
-                spritesImage,
-                8,
-                (27 + ones) * 8,
-                8,
-                8,
-                BOARD_WIDTH - 24 - 8 * j,
-                4,
-                8,
-                8
-            );
+            drawSprite(1, 27 + ones, SCREEN_WIDTH - 24 - SPRITE_SIZE * j, 4);
+
             tmp = Math.floor(tmp / 10);
             j++;
         }
