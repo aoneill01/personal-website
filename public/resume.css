@@ -1,7 +1,11 @@
-html, body {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 200;
+@charset "utf-8";
+
+html,
+body {
+    font-family: "Poppins", sans-serif;
+    font-weight: 300;
     margin: 1em 2em;
+    font-size: 18px;
 }
 
 main {
@@ -23,7 +27,8 @@ h3 {
     margin: 0;
 }
 
-a, a:visited {
+a,
+a:visited {
     color: black;
 }
 
@@ -58,22 +63,43 @@ a:hover {
     font-weight: 500;
 }
 
-.company, .university {
+.company,
+.university {
     margin-block-start: 1em;
 }
 .role {
     margin-inline-start: 2em;
 }
 
+#background {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: -1;
+}
+
 @media only screen and (max-width: 700px) {
+    html,
+    body {
+        margin: 0.5em 1em;
+        font-size: 16px;
+    }
+
     #qualifications ul {
         column-count: 2;
     }
 }
 
 @media only screen and (max-width: 500px) {
-    html, body {
+    html,
+    body {
         margin: 8px;
+        font-size: 14px;
+    }
+
+    h1 {
+        margin-block: 0;
     }
 
     .split {
