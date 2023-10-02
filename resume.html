@@ -12,9 +12,11 @@
         />
         <link href="./resume.css" rel="stylesheet" />
         <title>Andy O'Neill - Resume</title>
+      <script type="module" crossorigin src="./assets/resume-549cbcc1.js"></script>
+      <link rel="modulepreload" crossorigin href="./assets/modulepreload-polyfill-3cfb730f.js">
     </head>
     <body>
-        <svg viewBox="0 0 30 30" id="background"></svg>
+        <svg viewBox="0 0 30 15" id="background"></svg>
         <main>
             <div class="split">
                 <h1>Andy O'Neill</h1>
@@ -283,43 +285,6 @@
             </section>
         </main>
     </body>
-    <script lang="JavaScript">
 
-        const SVG_NS = "http://www.w3.org/2000/svg";
-        const svg = document.getElementById("background");
-
-        for (let row = -1; row < 10; row++) {
-          for (let col = -1; col < 17 - row * 2; col++) {
-            svg.appendChild(hexagon((col + (row % 2 === 0 ? 0 : .5)) * Math.sqrt(3), 1.5 * row, 1.02));
-          }
-        }
-
-        function hexagon(x, y, l) {
-          const halfSqrt3 = Math.sqrt(3) / 2;
-
-          const path = document.createElementNS(SVG_NS, "path");
-          path.setAttribute("d",`M ${x} ${y - l} l ${halfSqrt3 * l} ${.5 * l} l 0 ${l} l ${-halfSqrt3 * l} ${.5 * l} l ${-halfSqrt3 * l} ${-.5 * l} l 0 ${-l} Z`);
-          path.setAttribute("fill", "#e0e0e0");
-          path.setAttribute("transform-origin", `${x} ${y}`);
-          path.setAttribute("transform", "scale(1)");
-          path.setAttribute("class", "hex");
-          path.dataset.x = x;
-          path.dataset.y = y;
-
-          return path;
-        }
-
-        document.body.addEventListener('mousemove', ({clientX, clientY}) => {
-          let point = svg.createSVGPoint();
-          point.x = clientX;
-          point.y = clientY;
-          point = point.matrixTransform(svg.getScreenCTM().inverse());
-
-          for (const path of svg.querySelectorAll(".hex")) {
-            const sqrtDist = Math.sqrt(Math.sqrt((path.dataset.x - point.x) ** 2 + (path.dataset.y - point.y) ** 2));
-            const scale = (sqrtDist < 3 ? sqrtDist : 3) / 3;
-            path.setAttribute("transform", `scale(${scale})`);
-          }
-        });
-    </script>
+    
 </html>
