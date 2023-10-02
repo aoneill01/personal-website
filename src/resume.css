@@ -23,6 +23,10 @@ li {
     padding-inline-start: 0.25em;
 }
 
+h1 {
+    margin-block-end: 0;
+}
+
 h3 {
     margin: 0;
 }

@@ -400,6 +400,7 @@ on *Github*
 
 Find career info
 on *LinkedIn*
+or my *resume*
 
 I enjoy
 retro gaming

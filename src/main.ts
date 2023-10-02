@@ -68,7 +68,10 @@ function init() {
         if (game.tickCount === 3150) {
             document.getElementById("linkedin")?.classList.add("show");
         }
-        if (game.tickCount === 4415) {
+        if (game.tickCount === 3435) {
+            document.getElementById("resume")?.classList.add("show");
+        }
+        if (game.tickCount === 4665) {
             document.getElementById("scratch")?.classList.add("show");
         }
     }
