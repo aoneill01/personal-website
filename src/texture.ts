@@ -1,4 +1,4 @@
-import { SCREEEN_HEIGHT, SCREEN_WIDTH, Game, PlayerMode } from "./game.ts";
+import { SCREEN_HEIGHT, SCREEN_WIDTH, Game, PlayerMode } from "./game.ts";
 import sprites from "./images/sprites.png";
 
 // Sprite sheet of graphics.
@@ -27,7 +27,7 @@ export function initTexture(textureCanvas: HTMLCanvasElement): (game: Game) => v
     return function drawTexture(game: Game) {
         // Clear the screen
         ctx.fillStyle = "black";
-        ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEEN_HEIGHT);
+        ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
         // Starfield background
         const colors = ["#887722", "#776611", "#665500"];
@@ -35,7 +35,7 @@ export function initTexture(textureCanvas: HTMLCanvasElement): (game: Game) => v
             ctx.fillStyle = colors[star.depth];
             ctx.fillRect(
                 star.x,
-                Math.floor((star.y + game.tickCount * (0.2 - 0.05 * star.depth)) % SCREEEN_HEIGHT),
+                Math.floor((star.y + game.tickCount * (0.2 - 0.05 * star.depth)) % SCREEN_HEIGHT),
                 1,
                 1
             );
