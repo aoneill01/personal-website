@@ -5,6 +5,7 @@ import { initGl } from "./web-gl.ts";
 
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { GLTFLoader } from "three/examples/jsm/Addons.js";
 
 declare global {
     interface Window {
@@ -204,8 +205,25 @@ renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.querySelector("main")?.appendChild(renderer.domElement);
 
+const loader = new GLTFLoader();
+
+loader.load(
+    "arcade_machine_final.glb",
+    function (gltf) {
+        gltf.scene.scale.set(0.85, 0.85, 0.85);
+        gltf.scene.translateY(-6.65);
+        gltf.scene.translateX(-1.92);
+        scene.add(gltf.scene);
+    },
+    undefined,
+    function (error) {
+        console.error(error);
+    }
+);
+
 const geometry = generateCrtGeometry(Math.PI / 16, 16);
-console.log(geometry);
+geometry.rotateX(-0.45);
+geometry.translate(0, 0, -0.5);
 // const geometry = new THREE.BufferGeometry();
 
 // const vertices = new Float32Array([
@@ -239,7 +257,7 @@ const material = generateCrtMaterial();
 const cube = new THREE.Mesh(geometry, material);
 scene.add(cube);
 
-const light = new THREE.HemisphereLight(0xffaaaa, 0x080868);
+const light = new THREE.HemisphereLight(0xffffff, 0x080868);
 light.position.set(-1.25, 1, 1.25);
 scene.add(light);
 
