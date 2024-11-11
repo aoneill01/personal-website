@@ -84,8 +84,8 @@ function init() {
     console.log("%ctry running window.cheatMode()", "color: grey");
 }
 
-function generateCrtGeometry(widthAngle: number, widthDivisions: number) {
-    const geometry = new THREE.BufferGeometry();
+function generateCrt(widthAngle: number, widthDivisions: number) {
+    const crtGeometry = new THREE.BufferGeometry();
 
     const heightAngle = (widthAngle * SCREEN_HEIGHT) / SCREEN_WIDTH;
     const heightDivisions = Math.round((widthDivisions * SCREEN_HEIGHT) / SCREEN_WIDTH);
@@ -127,11 +127,17 @@ function generateCrtGeometry(widthAngle: number, widthDivisions: number) {
         }
     }
 
-    geometry.setIndex(indices);
-    geometry.setAttribute("uv", new THREE.BufferAttribute(new Float32Array(uvs), 2));
-    geometry.setAttribute("position", new THREE.BufferAttribute(new Float32Array(vertices), 3));
+    crtGeometry.setIndex(indices);
+    crtGeometry.setAttribute("uv", new THREE.BufferAttribute(new Float32Array(uvs), 2));
+    crtGeometry.setAttribute("position", new THREE.BufferAttribute(new Float32Array(vertices), 3));
 
-    return geometry;
+    crtGeometry.scale(1.6, 1.6, 1.6);
+    crtGeometry.rotateX(-0.45);
+    crtGeometry.translate(0, -0.1, -0.75);
+
+    const material = generateCrtMaterial();
+
+    return new THREE.Mesh(crtGeometry, material);
 }
 
 const texture = new THREE.CanvasTexture(document.getElementById("texture")!);
@@ -163,7 +169,7 @@ function generateCrtMaterial() {
 
       vec3 scanline(vec2 coord, vec3 screen)
         {
-            float intensity = 0.2 * (.75 + 0.25 * sin((coord.y + 200.0 * u_tickcount) / 30.0)) * 
+            float intensity = 0.25 * (.75 + 0.25 * sin((coord.y + 200.0 * u_tickcount) / 30.0)) * 
             (1.0 + 0.1 *sin(2.0 * 3.1415 * (coord.x + 0.25)));
             screen.rgb -= (0.3 + sin(2.0 * 3.1415 * (coord.y + 0.25))) * intensity;
             return screen;
@@ -210,9 +216,11 @@ const loader = new GLTFLoader();
 loader.load(
     "arcade_machine_final.glb",
     function (gltf) {
+        console.log(gltf.scene);
         gltf.scene.scale.set(0.85, 0.85, 0.85);
         gltf.scene.translateY(-6.65);
         gltf.scene.translateX(-1.92);
+        // gltf.scene.children[4].rotateZ(1);
         scene.add(gltf.scene);
     },
     undefined,
@@ -221,44 +229,15 @@ loader.load(
     }
 );
 
-const geometry = generateCrtGeometry(Math.PI / 16, 16);
-geometry.rotateX(-0.45);
-geometry.translate(0, 0, -0.5);
-// const geometry = new THREE.BufferGeometry();
+scene.add(generateCrt(Math.PI / 24, 16));
 
-// const vertices = new Float32Array([
-//     -1.0,
-//     -1.25,
-//     1.0, // v0
-//     1.0,
-//     -1.25,
-//     1.0, // v1
-//     1.0,
-//     1.25,
-//     1.0, // v2
-//     -1.0,
-//     1.25,
-//     1.0, // v3
-// ]);
+// const light = new THREE.HemisphereLight(0xff99ff, 0xffff99, 4);
+let light = new THREE.DirectionalLight(0xddddff, 3);
+light.position.set(20, 20, 20);
+scene.add(light);
 
-// const uvs = new Float32Array([0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0]);
-
-// const indices = [0, 1, 2, 2, 3, 0];
-
-// geometry.setIndex(indices);
-// geometry.setAttribute("uv", new THREE.BufferAttribute(uvs, 2));
-// geometry.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
-
-// const geometry = new THREE.BoxGeometry(1, 1, 1);
-// const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
-// const material = new THREE.MeshBasicMaterial({ map: texture });
-const material = generateCrtMaterial();
-
-const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
-
-const light = new THREE.HemisphereLight(0xffffff, 0x080868);
-light.position.set(-1.25, 1, 1.25);
+light = new THREE.DirectionalLight(0xff99dd, 0.5);
+light.position.set(-40, 20, 20);
 scene.add(light);
 
 camera.position.z = 3;
