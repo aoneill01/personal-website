@@ -4,6 +4,7 @@ import {
     CanvasTexture,
     Clock,
     DirectionalLight,
+    Group,
     IUniform,
     LinearFilter,
     Mesh,
@@ -73,15 +74,29 @@ export function initArcade(game: Game) {
     light.position.set(-40, 20, 20);
     scene.add(light);
 
-    camera.position.z = 2.7;
+    const boom = new Group();
+    boom.add(camera);
+    scene.add(boom);
+    camera.position.z = 2;
+    camera.position.y = 1;
+    camera.lookAt(0, -0.5, -2);
 
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
+    // const controls = new OrbitControls(camera, renderer.domElement);
+    // controls.enableDamping = true;
+
+    addEventListener("mousemove", (event) => {
+        const y = (2 * event.clientY) / window.innerHeight - 1;
+        const x = (2 * event.clientX) / window.innerWidth - 1;
+        camera.lookAt(0, -1.5 * y - 0.5, -2);
+        camera.position.z = 2 + 2 * Math.abs(x);
+        boom.rotation.y = -x;
+        // camera.rotateY(y);
+    });
 
     const clock = new Clock();
 
     function animate() {
-        controls.update();
+        // controls.update();
 
         if (controller) {
             if (game.controls.left) {
