@@ -1,5 +1,5 @@
 import "./style.css";
-import { Game, SCREEN_WIDTH, SCREEN_HEIGHT } from "./game.ts";
+import { Game } from "./game.ts";
 import { initTexture } from "./texture.ts";
 import { initArcade } from "./arcade.ts";
 

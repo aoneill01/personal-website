@@ -8,12 +8,12 @@ import {
     IUniform,
     LinearFilter,
     Mesh,
+    Object3D,
     PerspectiveCamera,
     Scene,
     ShaderMaterial,
     WebGLRenderer,
 } from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import { Game, SCREEN_HEIGHT, SCREEN_WIDTH } from "./game";
 import vertexShader from "./shaders/vertex.glsl?raw";
@@ -46,7 +46,7 @@ export function initArcade(game: Game) {
     }
 
     const loader = new GLTFLoader();
-    let controller;
+    let controller: Object3D;
 
     loader.load(
         "arcade_machine_final.glb",
