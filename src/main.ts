@@ -1,7 +1,7 @@
 import "./style.css";
-import { Game } from "./game.ts";
+import { Game, SCREEN_WIDTH, SCREEN_HEIGHT } from "./game.ts";
 import { initTexture } from "./texture.ts";
-import { initGl } from "./web-gl.ts";
+import { initArcade } from "./arcade.ts";
 
 declare global {
     interface Window {
@@ -47,10 +47,8 @@ function init() {
     };
 
     const textureCanvas = <HTMLCanvasElement>document.getElementById("texture");
-    const screenCanvas = <HTMLCanvasElement>document.getElementById("screen");
 
     const drawTexture = initTexture(textureCanvas);
-    const drawGl = initGl(screenCanvas, textureCanvas);
 
     setInterval(gameLoop, 1000 / 60);
 
@@ -59,8 +57,6 @@ function init() {
         game.tick();
         // Draw to hidden canvas
         drawTexture(game);
-        // Draw to screen with shader effects
-        drawGl(game);
 
         if (game.tickCount === 2395) {
             document.getElementById("github")?.classList.add("show");
@@ -75,6 +71,8 @@ function init() {
             document.getElementById("scratch")?.classList.add("show");
         }
     }
+
+    initArcade(game);
 
     console.log("%c👋 Welcome to my website! 👋", "font-size: 20px");
     console.log("%ctry running window.cheatMode()", "color: grey");

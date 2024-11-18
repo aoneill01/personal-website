@@ -7,7 +7,7 @@ const COLUMNS = 28;
 const ROWS = 36;
 
 export const SCREEN_WIDTH = COLUMNS * ENEMY_SIZE;
-export const SCREEEN_HEIGHT = ROWS * ENEMY_SIZE;
+export const SCREEN_HEIGHT = ROWS * ENEMY_SIZE;
 
 const explosion = new Audio(explosionWav);
 const laserShoot = new Audio(laserShootWav);
@@ -236,7 +236,7 @@ class Enemy extends Sprite {
     private startTickCount?: number;
 
     constructor(row: number, column: number, spriteY: number, spriteX: number) {
-        super(SCREEEN_HEIGHT, SCREEN_WIDTH, ENEMY_SIZE, ENEMY_SIZE);
+        super(SCREEN_HEIGHT, SCREEN_WIDTH, ENEMY_SIZE, ENEMY_SIZE);
         this.row = row;
         this.column = column;
         this.spriteY = spriteY;
@@ -293,7 +293,7 @@ class Enemy extends Sprite {
                     this.startX = this.x;
                     this.startY = this.y;
                     this.targetX = Math.random() * SCREEN_WIDTH;
-                    this.targetY = SCREEEN_HEIGHT;
+                    this.targetY = SCREEN_HEIGHT;
                 }
                 break;
             case EnemyMode.Dive:
@@ -341,7 +341,7 @@ class Bullet extends Sprite {
     }
 
     isLive() {
-        return this.y > 0 && this.y < SCREEEN_HEIGHT && !this.dead;
+        return this.y > 0 && this.y < SCREEN_HEIGHT && !this.dead;
     }
 }
 
@@ -349,7 +349,7 @@ class Star extends Sprite {
     depth: number;
 
     constructor() {
-        super(Math.floor(Math.random() * SCREEN_WIDTH), Math.floor(Math.random() * SCREEEN_HEIGHT));
+        super(Math.floor(Math.random() * SCREEN_WIDTH), Math.floor(Math.random() * SCREEN_HEIGHT));
         this.depth = Math.floor(Math.random() * 3);
     }
 }
@@ -370,7 +370,7 @@ class Particle extends Sprite {
     tick() {
         this.x += this.vx;
         this.y += this.vy;
-        this.dead = this.x < 0 || this.x > SCREEN_WIDTH || this.y < 0 || this.y > SCREEEN_HEIGHT;
+        this.dead = this.x < 0 || this.x > SCREEN_WIDTH || this.y < 0 || this.y > SCREEN_HEIGHT;
     }
 }
 

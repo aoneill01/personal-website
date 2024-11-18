@@ -1,10 +1,8 @@
-attribute vec4 a_position;
-attribute vec2 a_texcoord;
-
-varying vec2 v_texcoord;
+varying vec2 vUv; 
 
 void main() {
-  gl_Position = a_position;
+  vUv = uv;
 
-  v_texcoord = a_texcoord;
+  vec4 modelViewPosition = modelViewMatrix * vec4(position, 1.0);
+  gl_Position = projectionMatrix * modelViewPosition; 
 }
