@@ -23,6 +23,7 @@ function init() {
             case " ":
                 ev.preventDefault();
                 if (!ev.repeat) game.controls.fire = true;
+                game.controls.firePressed = true;
                 break;
         }
     });
@@ -37,6 +38,7 @@ function init() {
                 break;
             case " ":
                 game.controls.fire = false;
+                game.controls.firePressed = false;
                 break;
         }
     });

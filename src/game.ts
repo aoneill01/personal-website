@@ -378,6 +378,7 @@ class Controls {
     left: boolean = false;
     right: boolean = false;
     fire: boolean = false;
+    firePressed: boolean = false;
 }
 
 type MessageBlock = {

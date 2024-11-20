@@ -1,4 +1,5 @@
 import {
+    AmbientLight,
     BufferAttribute,
     BufferGeometry,
     CanvasTexture,
@@ -6,6 +7,7 @@ import {
     DirectionalLight,
     Group,
     IUniform,
+    Light,
     LinearFilter,
     Mesh,
     Object3D,
@@ -47,11 +49,14 @@ export function initArcade(game: Game) {
 
     const loader = new GLTFLoader();
     let controller: Object3D;
+    let button: Object3D;
 
     loader.load(
         "arcade_machine_final.glb",
         function (gltf) {
-            controller = gltf.scene.children[4];
+            console.log(gltf.scene);
+            controller = gltf.scene.children.find((child) => child.name === "joystick")!;
+            button = gltf.scene.children.find((child) => child.name === "button")!;
             gltf.scene.scale.set(0.85, 0.85, 0.85);
             gltf.scene.translateY(-6.65);
             gltf.scene.translateX(-1.92);
@@ -66,12 +71,15 @@ export function initArcade(game: Game) {
     scene.add(generateCrt(Math.PI / 24, 16, uniforms));
 
     // const light = new HemisphereLight(0xff99ff, 0xffff99, 4);
-    let light = new DirectionalLight(0xddddff, 5);
+    let light: Light = new DirectionalLight(0xffffff, 5);
     light.position.set(20, 20, 10);
     scene.add(light);
 
     light = new DirectionalLight(0xff99dd, 0.5);
     light.position.set(-40, 20, 20);
+    scene.add(light);
+
+    light = new AmbientLight(0xff5555);
     scene.add(light);
 
     const boom = new Group();
@@ -113,6 +121,9 @@ export function initArcade(game: Game) {
                 controllerAngle += 0.1 * (0.0 - controllerAngle);
             }
             controller.rotation.set(0, 0, controllerAngle);
+        }
+        if (button) {
+            button.position.setY(5.975976943969727 + (game.controls.firePressed ? -0.02 : 0));
         }
         uniforms.u_tickcount.value = clock.getElapsedTime();
         texture.needsUpdate = true;
