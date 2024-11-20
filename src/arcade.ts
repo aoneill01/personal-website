@@ -78,34 +78,41 @@ export function initArcade(game: Game) {
     boom.add(camera);
     scene.add(boom);
     camera.position.z = 2;
-    camera.position.y = 1;
+    camera.position.y = 1.0;
     camera.lookAt(0, -0.5, -2);
 
     // const controls = new OrbitControls(camera, renderer.domElement);
     // controls.enableDamping = true;
+    let x = 0;
+    let y = 0;
+    let targetX = 0;
+    let targetY = 0;
+    let controllerAngle = 0;
 
     addEventListener("mousemove", (event) => {
-        const y = (2 * event.clientY) / window.innerHeight - 1;
-        const x = (2 * event.clientX) / window.innerWidth - 1;
-        camera.lookAt(0, -1.5 * y - 0.5, -2);
-        camera.position.z = 2 + 2 * Math.abs(x);
-        boom.rotation.y = -x;
-        // camera.rotateY(y);
+        targetY = (2 * event.clientY) / window.innerHeight - 1;
+        targetX = (2 * event.clientX) / window.innerWidth - 1;
     });
 
     const clock = new Clock();
 
     function animate() {
         // controls.update();
+        y += 0.05 * (targetY - y);
+        x += 0.05 * (targetX - x);
+        camera.lookAt(0, -1.5 * y - 0.5, -2);
+        camera.position.z = 2 + 2 * x ** 2;
+        boom.rotation.y = -x;
 
         if (controller) {
             if (game.controls.left) {
-                controller.rotation.set(0, 0, 0.5);
+                controllerAngle += 0.1 * (0.5 - controllerAngle);
             } else if (game.controls.right) {
-                controller.rotation.set(0, 0, -0.5);
+                controllerAngle += 0.1 * (-0.5 - controllerAngle);
             } else {
-                controller.rotation.set(0, 0, 0);
+                controllerAngle += 0.1 * (0.0 - controllerAngle);
             }
+            controller.rotation.set(0, 0, controllerAngle);
         }
         uniforms.u_tickcount.value = clock.getElapsedTime();
         texture.needsUpdate = true;
