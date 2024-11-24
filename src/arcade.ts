@@ -3,7 +3,6 @@ import {
     BufferAttribute,
     BufferGeometry,
     CanvasTexture,
-    Clock,
     DirectionalLight,
     Group,
     IUniform,
@@ -16,7 +15,7 @@ import {
     ShaderMaterial,
     WebGLRenderer,
 } from "three";
-import { GLTFLoader } from "three/examples/jsm/Addons.js";
+import { GLTFLoader, Timer } from "three/examples/jsm/Addons.js";
 import { Game, SCREEN_HEIGHT, SCREEN_WIDTH } from "./game";
 import vertexShader from "./shaders/vertex.glsl?raw";
 import fragmentShader from "./shaders/fragment.glsl?raw";
@@ -61,6 +60,7 @@ export function initArcade(game: Game) {
             gltf.scene.translateY(-6.65);
             gltf.scene.translateX(-1.92);
             scene.add(gltf.scene);
+            renderer.setAnimationLoop(animate);
         },
         undefined,
         function (error) {
@@ -89,8 +89,6 @@ export function initArcade(game: Game) {
     camera.position.y = 1.0;
     camera.lookAt(0, -0.5, -2);
 
-    // const controls = new OrbitControls(camera, renderer.domElement);
-    // controls.enableDamping = true;
     let x = 0;
     let y = 0;
     let targetX = 0;
@@ -102,34 +100,36 @@ export function initArcade(game: Game) {
         targetX = (2 * event.clientX) / window.innerWidth - 1;
     });
 
-    const clock = new Clock();
+    const timer = new Timer();
 
-    function animate() {
-        // controls.update();
-        y += 0.05 * (targetY - y);
-        x += 0.05 * (targetX - x);
+    function animate(timestamp: number) {
+        timer.update(timestamp);
+        const delta = timer.getDelta();
+        if (delta === 0) return;
+
+        y += 10 * (targetY - y) * delta;
+        x += 10 * (targetX - x) * delta;
         camera.lookAt(0, -1.5 * y - 0.5, -2);
         camera.position.z = 2 + 2 * x ** 2;
         boom.rotation.y = -x;
 
         if (controller) {
             if (game.controls.left) {
-                controllerAngle += 0.1 * (0.5 - controllerAngle);
+                controllerAngle += 10 * (0.5 - controllerAngle) * delta;
             } else if (game.controls.right) {
-                controllerAngle += 0.1 * (-0.5 - controllerAngle);
+                controllerAngle += 10 * (-0.5 - controllerAngle) * delta;
             } else {
-                controllerAngle += 0.1 * (0.0 - controllerAngle);
+                controllerAngle += 10 * (0.0 - controllerAngle) * delta;
             }
             controller.rotation.set(0, 0, controllerAngle);
         }
         if (button) {
             button.position.setY(5.975976943969727 + (game.controls.firePressed ? -0.02 : 0));
         }
-        uniforms.u_tickcount.value = clock.getElapsedTime();
+        uniforms.u_tickcount.value = timer.getElapsed();
         texture.needsUpdate = true;
         renderer.render(scene, camera);
     }
-    renderer.setAnimationLoop(animate);
 }
 
 function generateCrt(
