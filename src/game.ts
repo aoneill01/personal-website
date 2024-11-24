@@ -25,6 +25,7 @@ export class Game {
     particles: Particle[] = [];
     turbo: boolean = false;
     fireCountdown: number = 0;
+    started: boolean = false;
 
     constructor() {
         this.enemyGenerator = getEnemies();
@@ -37,6 +38,8 @@ export class Game {
     }
 
     tick() {
+        if (!this.started) return;
+
         this.tickCount++;
 
         // Time to spawn more enemies

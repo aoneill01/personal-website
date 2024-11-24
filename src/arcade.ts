@@ -19,6 +19,19 @@ import { GLTFLoader, Timer } from "three/examples/jsm/Addons.js";
 import { Game, SCREEN_HEIGHT, SCREEN_WIDTH } from "./game";
 import vertexShader from "./shaders/vertex.glsl?raw";
 import fragmentShader from "./shaders/fragment.glsl?raw";
+import gsap from "gsap";
+
+const lookAtScreen = {
+    x: 0,
+    y: -0.5,
+    z: -2,
+};
+
+const standingPosition = {
+    x: 0,
+    y: 1.0,
+    z: 2.0,
+};
 
 export function initArcade(game: Game) {
     const texture = new CanvasTexture(document.getElementById("texture")!);
@@ -53,7 +66,6 @@ export function initArcade(game: Game) {
     loader.load(
         "arcade_machine_final.glb",
         function (gltf) {
-            console.log(gltf.scene);
             controller = gltf.scene.children.find((child) => child.name === "joystick")!;
             button = gltf.scene.children.find((child) => child.name === "button")!;
             gltf.scene.scale.set(0.85, 0.85, 0.85);
@@ -61,6 +73,20 @@ export function initArcade(game: Game) {
             gltf.scene.translateX(-1.92);
             scene.add(gltf.scene);
             renderer.setAnimationLoop(animate);
+
+            gsap.to(boom.rotation, { duration: 3, y: 0 });
+            gsap.to(camera.position, {
+                duration: 5,
+                x: standingPosition.x,
+                y: standingPosition.y,
+                z: standingPosition.z,
+                onUpdate: () => {
+                    camera.lookAt(lookAtScreen.x, lookAtScreen.y, lookAtScreen.z);
+                },
+                onComplete: () => {
+                    game.started = true;
+                },
+            });
         },
         undefined,
         function (error) {
@@ -85,9 +111,10 @@ export function initArcade(game: Game) {
     const boom = new Group();
     boom.add(camera);
     scene.add(boom);
-    camera.position.z = 2;
-    camera.position.y = 1.0;
-    camera.lookAt(0, -0.5, -2);
+    boom.rotation.y = Math.PI / 2;
+    camera.position.z = 20;
+    camera.position.y = 10;
+    camera.lookAt(lookAtScreen.x, lookAtScreen.y, lookAtScreen.z);
 
     let x = 0;
     let y = 0;
@@ -107,11 +134,13 @@ export function initArcade(game: Game) {
         const delta = timer.getDelta();
         if (delta === 0) return;
 
-        y += 10 * (targetY - y) * delta;
-        x += 10 * (targetX - x) * delta;
-        camera.lookAt(0, -1.5 * y - 0.5, -2);
-        camera.position.z = 2 + 2 * x ** 2;
-        boom.rotation.y = -x;
+        if (game.started) {
+            y += 10 * (targetY - y) * delta;
+            x += 10 * (targetX - x) * delta;
+            camera.lookAt(lookAtScreen.x, -1.5 * y + lookAtScreen.y, lookAtScreen.z);
+            camera.position.z = 2 + 2 * x ** 2;
+            boom.rotation.y = -x;
+        }
 
         if (controller) {
             if (game.controls.left) {

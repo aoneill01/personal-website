@@ -29,6 +29,18 @@ export function initTexture(textureCanvas: HTMLCanvasElement): (game: Game) => v
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
+        if (!game.started) {
+            ctx.beginPath();
+            ctx.strokeStyle = "white";
+            for (let x = SPRITE_SIZE; x < SCREEN_WIDTH - SPRITE_SIZE; x += 2 * SPRITE_SIZE) {
+                for (let y = SPRITE_SIZE; y < SCREEN_HEIGHT - SPRITE_SIZE; y += 2 * SPRITE_SIZE) {
+                    ctx.rect(x + 0.5, y + 0.5, 2 * SPRITE_SIZE - 1, 2 * SPRITE_SIZE - 1);
+                }
+            }
+            ctx.stroke();
+            return;
+        }
+
         // Starfield background
         const colors = ["#887722", "#776611", "#665500"];
         for (const star of game.stars) {

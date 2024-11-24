@@ -14,9 +14,11 @@ function init() {
 
     document.addEventListener("keydown", (ev) => {
         switch (ev.key) {
+            case "a":
             case "ArrowLeft":
                 game.controls.left = true;
                 break;
+            case "d":
             case "ArrowRight":
                 game.controls.right = true;
                 break;
@@ -30,9 +32,11 @@ function init() {
 
     document.addEventListener("keyup", (ev) => {
         switch (ev.key) {
+            case "a":
             case "ArrowLeft":
                 game.controls.left = false;
                 break;
+            case "d":
             case "ArrowRight":
                 game.controls.right = false;
                 break;
