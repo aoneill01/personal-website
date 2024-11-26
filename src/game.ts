@@ -35,6 +35,8 @@ export class Game {
         for (let i = 0; i < 100; i++) {
             this.stars.push(new Star());
         }
+
+        explosion.volume = 0.2;
     }
 
     tick() {

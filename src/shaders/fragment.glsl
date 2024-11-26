@@ -12,11 +12,11 @@ vec3 scanline(vec2 coord, vec3 screen)
 
 vec3 sampleSplit(sampler2D tex, vec2 coord)
 {
-	float intensity = 0.012 * (.8 + 0.2 * sin((coord.y + 200.0 * u_tickcount) / 30.0));
+	float intensity = 0.003 * sin(5.0 * coord.y + 5.0 * u_tickcount);
 	vec3 frag;
-	frag.r = texture2D(tex, vec2(coord.x - intensity * (0.5) + intensity, coord.y)).r;
-	frag.g = texture2D(tex, vec2(coord.x + intensity, coord.y)).g;
-	frag.b = texture2D(tex, vec2(coord.x + intensity * (0.5) + intensity, coord.y)).b;
+	frag.r = texture2D(tex, vec2(coord.x - intensity, coord.y)).r;
+	frag.g = texture2D(tex, coord).g;
+	frag.b = texture2D(tex, vec2(coord.x + intensity, coord.y)).b;
 	return frag;
 }
 

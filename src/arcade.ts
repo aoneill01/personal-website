@@ -23,14 +23,14 @@ import gsap from "gsap";
 
 const lookAtScreen = {
     x: 0,
-    y: -0.5,
+    y: -0.7,
     z: -2,
 };
 
 const standingPosition = {
     x: 0,
     y: 1.0,
-    z: 2.0,
+    z: 1,
 };
 
 export function initArcade(game: Game) {
@@ -138,7 +138,7 @@ export function initArcade(game: Game) {
             y += 10 * (targetY - y) * delta;
             x += 10 * (targetX - x) * delta;
             camera.lookAt(lookAtScreen.x, -1.5 * y + lookAtScreen.y, lookAtScreen.z);
-            camera.position.z = 2 + 2 * x ** 2;
+            camera.position.z = standingPosition.z + 2 * x ** 2 + 2 * y ** 2;
             boom.rotation.y = -x;
         }
 
