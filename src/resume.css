@@ -1,5 +1,15 @@
 @charset "utf-8";
 
+html {
+    background-color: whitesmoke;
+}
+
+@media (prefers-color-scheme: dark) {
+    html {
+        filter: invert(1);
+    }
+}
+
 html,
 body {
     font-family: "Poppins", sans-serif;

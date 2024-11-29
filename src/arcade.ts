@@ -85,6 +85,11 @@ export function initArcade(game: Game) {
                 },
                 onComplete: () => {
                     game.started = true;
+
+                    addEventListener("mousemove", (event) => {
+                        targetY = (2 * event.clientY) / window.innerHeight - 1;
+                        targetX = (2 * event.clientX) / window.innerWidth - 1;
+                    });
                 },
             });
         },
@@ -121,11 +126,6 @@ export function initArcade(game: Game) {
     let targetX = 0;
     let targetY = 0;
     let controllerAngle = 0;
-
-    addEventListener("mousemove", (event) => {
-        targetY = (2 * event.clientY) / window.innerHeight - 1;
-        targetX = (2 * event.clientX) / window.innerWidth - 1;
-    });
 
     const timer = new Timer();
 
