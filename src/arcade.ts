@@ -3,10 +3,8 @@ import {
     BufferAttribute,
     BufferGeometry,
     CanvasTexture,
-    DirectionalLight,
     Group,
     IUniform,
-    Light,
     LinearFilter,
     Mesh,
     Object3D,
@@ -29,7 +27,7 @@ const lookAtScreen = {
 
 const standingPosition = {
     x: 0,
-    y: 16.0,
+    y: 17.0,
     z: 6,
 };
 
@@ -66,9 +64,8 @@ export function initArcade(game: Game) {
     loader.load(
         "arcade.glb",
         function (gltf) {
-            controller = gltf.scene.children.find((child) => child.name === "joystick")!;
+            controller = gltf.scene.children.find((child) => child.name === "Joystick")!;
             button = gltf.scene.children.find((child) => child.name === "Fire_Button")!;
-            console.log(gltf.scene);
             scene.add(gltf.scene);
             renderer.setAnimationLoop(animate);
 
@@ -99,17 +96,8 @@ export function initArcade(game: Game) {
 
     scene.add(generateCrt(Math.PI / 24, 16, uniforms));
 
-    // const light = new HemisphereLight(0xff99ff, 0xffff99, 4);
-    let light: Light = new DirectionalLight(0xffffff, 5);
-    light.position.set(20, 20, 10);
-    // scene.add(light);
-
-    light = new DirectionalLight(0xff99dd, 0.5);
-    light.position.set(-40, 20, 20);
-    // scene.add(light);
-
-    light = new AmbientLight(0xffeeee);
-    // scene.add(light);
+    const light = new AmbientLight(0xffeeee);
+    scene.add(light);
 
     const boom = new Group();
     boom.add(camera);
@@ -142,9 +130,9 @@ export function initArcade(game: Game) {
 
         if (controller) {
             if (game.controls.left) {
-                controllerAngle += 10 * (0.5 - controllerAngle) * delta;
+                controllerAngle += 10 * (0.25 - controllerAngle) * delta;
             } else if (game.controls.right) {
-                controllerAngle += 10 * (-0.5 - controllerAngle) * delta;
+                controllerAngle += 10 * (-0.25 - controllerAngle) * delta;
             } else {
                 controllerAngle += 10 * (0.0 - controllerAngle) * delta;
             }
@@ -210,9 +198,9 @@ function generateCrt(
     crtGeometry.setAttribute("uv", new BufferAttribute(new Float32Array(uvs), 2));
     crtGeometry.setAttribute("position", new BufferAttribute(new Float32Array(vertices), 3));
 
-    crtGeometry.scale(3.3, 3.3, 3.3);
+    crtGeometry.scale(3.5, 3.5, 3.5);
     crtGeometry.rotateX(-0.261799);
-    crtGeometry.translate(0, 15, -0.75);
+    crtGeometry.translate(0, 15.1, -0.2);
 
     const material = generateCrtMaterial(uniforms);
 
