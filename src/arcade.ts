@@ -23,14 +23,14 @@ import gsap from "gsap";
 
 const lookAtScreen = {
     x: 0,
-    y: -0.7,
-    z: -2,
+    y: 15,
+    z: 0,
 };
 
 const standingPosition = {
     x: 0,
-    y: 1.0,
-    z: 1,
+    y: 16.0,
+    z: 6,
 };
 
 export function initArcade(game: Game) {
@@ -64,13 +64,11 @@ export function initArcade(game: Game) {
     let button: Object3D;
 
     loader.load(
-        "arcade_machine_final.glb",
+        "arcade.glb",
         function (gltf) {
             controller = gltf.scene.children.find((child) => child.name === "joystick")!;
-            button = gltf.scene.children.find((child) => child.name === "button")!;
-            gltf.scene.scale.set(0.85, 0.85, 0.85);
-            gltf.scene.translateY(-6.65);
-            gltf.scene.translateX(-1.92);
+            button = gltf.scene.children.find((child) => child.name === "Fire_Button")!;
+            console.log(gltf.scene);
             scene.add(gltf.scene);
             renderer.setAnimationLoop(animate);
 
@@ -104,21 +102,21 @@ export function initArcade(game: Game) {
     // const light = new HemisphereLight(0xff99ff, 0xffff99, 4);
     let light: Light = new DirectionalLight(0xffffff, 5);
     light.position.set(20, 20, 10);
-    scene.add(light);
+    // scene.add(light);
 
     light = new DirectionalLight(0xff99dd, 0.5);
     light.position.set(-40, 20, 20);
-    scene.add(light);
+    // scene.add(light);
 
-    light = new AmbientLight(0xff5555);
-    scene.add(light);
+    light = new AmbientLight(0xffeeee);
+    // scene.add(light);
 
     const boom = new Group();
     boom.add(camera);
     scene.add(boom);
     boom.rotation.y = Math.PI / 2;
-    camera.position.z = 20;
-    camera.position.y = 10;
+    camera.position.z = 50;
+    camera.position.y = 30;
     camera.lookAt(lookAtScreen.x, lookAtScreen.y, lookAtScreen.z);
 
     let x = 0;
@@ -153,7 +151,7 @@ export function initArcade(game: Game) {
             controller.rotation.set(0, 0, controllerAngle);
         }
         if (button) {
-            button.position.setY(5.975976943969727 + (game.controls.firePressed ? -0.02 : 0));
+            button.position.setY(12.079902648925781 + (game.controls.firePressed ? -0.05 : 0));
         }
         uniforms.u_tickcount.value = timer.getElapsed();
         texture.needsUpdate = true;
@@ -212,9 +210,9 @@ function generateCrt(
     crtGeometry.setAttribute("uv", new BufferAttribute(new Float32Array(uvs), 2));
     crtGeometry.setAttribute("position", new BufferAttribute(new Float32Array(vertices), 3));
 
-    crtGeometry.scale(1.6, 1.6, 1.6);
-    crtGeometry.rotateX(-0.45);
-    crtGeometry.translate(0, -0.1, -0.75);
+    crtGeometry.scale(3.3, 3.3, 3.3);
+    crtGeometry.rotateX(-0.261799);
+    crtGeometry.translate(0, 15, -0.75);
 
     const material = generateCrtMaterial(uniforms);
 
