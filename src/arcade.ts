@@ -123,9 +123,9 @@ export function initArcade(game: Game) {
         if (game.started) {
             y += 10 * (targetY - y) * delta;
             x += 10 * (targetX - x) * delta;
-            camera.lookAt(lookAtScreen.x, -1.5 * y + lookAtScreen.y, lookAtScreen.z);
+            camera.lookAt(2 * x + lookAtScreen.x, -2 * y + lookAtScreen.y, lookAtScreen.z);
             camera.position.z = standingPosition.z + 2 * x ** 2 + 2 * y ** 2;
-            boom.rotation.y = -x;
+            boom.rotation.y = x;
         }
 
         if (controller) {
