@@ -413,6 +413,7 @@ retro gaming
 mechanical keyboards
 *programming*
 origami
+chess
 `.toUpperCase();
 
     const lines = text.split("\n");
